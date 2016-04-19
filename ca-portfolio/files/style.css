@@ -225,6 +225,7 @@ iframe {
   width: 970px;
   height: 1900px;
   float: left;
+  margin-left: 48px;
  }
 
 .popeCode {
