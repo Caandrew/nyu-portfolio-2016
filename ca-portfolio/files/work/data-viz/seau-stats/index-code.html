@@ -1,0 +1,371 @@
+&lt;!DOCTYPE html&gt;<br />
+&lt;html&gt;<br />
+	&lt;head&gt;<br />
+		&lt;meta charset="utf-8"&gt;<br />
+		 &lt;link rel="stylesheet" href="style.css"&gt;<br />
+		&lt;script src="http://d3js.org/d3.v3.min.js"&gt;&lt;/script&gt;<br />
+		&lt;script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"&gt;&lt;/script&gt;<br />
+	&lt;/head&gt;<br />
+	&lt;body&gt;<br />
+		&lt;div id="wrap"&gt;<br />
+            &lt;div class="dvoaHEAD"&gt;<br />
+            &lt;h1&gt; Seau's Effect on the Chargers' Defense&lt;/h1&gt;<br />
+            &lt;p&gt;From 1990-2002, the time period for which Seau was a San Diego Charger, the team had a visibly stronger defense. The average DVOA* during Seau's tenure was &lt;span class="better"&gt;-0.38&lt;/span&gt;, almost eight times stronger than the post-Seau average of &lt;span class="worse"&gt;3.02&lt;/span&gt;. <br />
+          	&lt;div class="dvoa"&gt;&lt;/div&gt;<br />
+            <br />
+            <br />
+            &lt;p class="foot"&gt;* Developed by &lt;a href="http://www.footballoutsiders.com/"&gt;Football Outsiders&lt;/a&gt; the &lt;a href="http://www.footballoutsiders.com/info/methods#DVOA"&gt;Defense-adjusted Value Over Average&lt;/a&gt; or "DVOA" is a statistic that "measures a team's efficiency by comparing success on every single play to a league average based on situation and opponent" and effectively shows the strength of a given team's defense during a given season.&lt;/p&gt;<br />
+          <br />
+            <br />
+            &lt;h1 class="spacer"&gt; How Seau Stacks Up Against Other Notable Linebackers&lt;/h1&gt;<br />
+            &lt;p&gt;With more career Pro-Bowl selections than any other inductee, as well as an impressive number of First-Team All-Pro selections, Junior Seau stands out when compared to other Hall of Fame linebackers and potential HOFers alike.<br />
+            &lt;/p&gt;<br />
+        	&lt;div class="scatter"&gt;&lt;/div&gt;<br />
+     		&lt;div style="clear:both"&gt;&lt;/div&gt;<br />
+     		&lt;div class="credits"&gt;Credits: Cynthia Andrews / NBC&lt;/div&gt;<br />
+     		&lt;div class="credits"&gt;Sources: Football Outsiders, Pro-Football-Reference.com, The Elias Sports Bureau&lt;/div&gt;<br />
+     	&lt;/div&gt;<br />
+<br />
+<br />
+		&lt;script&gt;<br />
+var margin = {top: 35, right: 40, bottom: 50, left: 45},<br />
+	width = 650 - margin.left - margin.right,<br />
+	height = 400 - margin.top - margin.bottom;<br />
+<br />
+/* <br />
+ * value accessor - returns the value to encode for a given data object.<br />
+ * scale - maps value to a visual display encoding, such as a pixel position.<br />
+ * map function - maps from data value to display value<br />
+ * axis - sets up axis<br />
+ */ <br />
+<br />
+// setup x <br />
+var xValue = function(d) { return d.ap1;}, // data -&gt; value<br />
+    xScale = d3.scale.linear()<br />
+    .range([0, width]), // value -&gt; display<br />
+    <br />
+    xMap = function(d) { return xScale(xValue(d));}, // data -&gt; display<br />
+    xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(4).tickSize(-height).tickPadding(8);;;<br />
+    xLine = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(function (d) { return ''; });<br />
+<br />
+// setup y<br />
+var yValue = function(d) { return d.pb;}, // data -&gt; value<br />
+    yScale = d3.scale.linear()<br />
+    .range([height, 0]), // value -&gt; display<br />
+    <br />
+    yMap = function(d) { return yScale(yValue(d));}, // data -&gt; display<br />
+    yAxis = d3.svg.axis().scale(yScale).orient("left").tickValues(d3.range(0, 18, 2)).tickSize(-width).tickPadding(6);;<br />
+    yLine = d3.svg.axis().scale(yScale).orient("left").tickFormat(function (d) { return ''; });<br />
+<br />
+// add the graph canvas to the body of the webpage<br />
+var svg = d3.select(".scatter").append("svg")<br />
+    .attr("width", width + margin.left + margin.right)<br />
+    .attr("height", height + margin.top + margin.bottom)<br />
+  .append("g")<br />
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");<br />
+<br />
+// add the tooltip area to the webpage<br />
+var tooltip = d3.select("body").append("div")<br />
+    .attr("class", "tooltip")<br />
+    .style("opacity", 0)<br />
+<br />
+// load data<br />
+d3.csv("career.csv", function(error, data) {<br />
+<br />
+  // change string (from CSV) into number format<br />
+  data.forEach(function(d) {<br />
+    d.ap1 = +d.ap1;<br />
+    d["pb (g)"] = +d["pb (g)"];<br />
+//    console.log(d);<br />
+  });<br />
+<br />
+  // don't want dots overlapping axis, so add in buffer to data domain<br />
+  xScale.domain([d3.min(data, xValue)-.5, d3.max(data, xValue)]);<br />
+  yScale.domain([d3.min(data, yValue)-1, 14]);<br />
+<br />
+    // x-grid<br />
+  svg.append("g")<br />
+      .attr("class", "axis")<br />
+      .attr("transform", "translate(0," + height + ")")<br />
+      .call(xAxis)<br />
+    .append("text")<br />
+      .attr("class", "label")<br />
+      .attr("x", width)<br />
+      .attr("y", 35)<br />
+      .style("text-anchor", "end")<br />
+      .text("First-Team All-Pro Selections");<br />
+<br />
+  // y-grid<br />
+  svg.append("g")<br />
+      .attr("class", "axis")<br />
+      .call(yAxis)<br />
+    .append("text")<br />
+      .attr("class", "label")<br />
+      .attr("transform", "rotate(-90)")<br />
+      .attr("y", -40)<br />
+      .attr("dy", ".71em")<br />
+      .style("text-anchor", "end")<br />
+      .text("Career Pro Bowl Selections")<br />
+<br />
+//xaxis<br />
+  svg.append("g")<br />
+      .attr("class", "axis2")<br />
+      .call(xLine)<br />
+      .attr("transform", "translate(0," + height + ")")<br />
+      .style("stroke-width", 1);<br />
+<br />
+//yaxis<br />
+  svg.append("g")<br />
+      .attr("class", "axis2")<br />
+      .call(yLine)<br />
+      .style("stroke-width", 1);<br />
+<br />
+  // draw hof dots<br />
+<br />
+   svg.selectAll(".dot")<br />
+      .data(data)<br />
+    .enter().append("circle")<br />
+    .filter(function(d) { return d.hof == "seau_hof" })<br />
+      .attr("class", "dot")<br />
+      .attr("r", 5)<br />
+      .attr("cx", xMap)<br />
+      .attr("cy", yMap)<br />
+      .style("fill", "#FFD700")<br />
+      .style("stroke", "#EEC900")<br />
+      .on("mouseover", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(200)<br />
+               .style("opacity", .9);<br />
+                  tooltip.html(d["name"] + "&lt;br/&gt;" + yValue(d) + " time Pro Bowl " <br />
+          + "&lt;br/&gt;" + xValue(d) + " time All Pro")<br />
+               .style("left", (d3.event.pageX + 5) + "px")<br />
+               .style("top", (d3.event.pageY - 28) + "px");<br />
+      })<br />
+      .on("mouseout", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(500)<br />
+               .style("opacity", 0);<br />
+<br />
+      });<br />
+<br />
+svg.selectAll(".dot")<br />
+      .data(data)<br />
+    .enter().append("circle")<br />
+    .filter(function(d) { return d.hof == "y" })<br />
+      .attr("class", "dot")<br />
+      .attr("r", 5)<br />
+      .attr("cx", xMap)<br />
+      .attr("cy", yMap)<br />
+      .style("fill", "#36648B")<br />
+      .style("stroke", "darkblue")<br />
+      .on("mouseover", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(200)<br />
+               .style("opacity", .9);<br />
+                  tooltip.html(d["name"] + "&lt;br/&gt;" + yValue(d) + " time Pro Bowl " <br />
+          + "&lt;br/&gt;" + xValue(d) + " time All Pro")<br />
+               .style("left", (d3.event.pageX + 5) + "px")<br />
+               .style("top", (d3.event.pageY - 28) + "px");<br />
+      })<br />
+      .on("mouseout", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(500)<br />
+               .style("opacity", 0);<br />
+<br />
+      });<br />
+//draw non hof dots<br />
+<br />
+   svg.selectAll(".dot")<br />
+      .data(data)<br />
+    .enter().append("circle")<br />
+    .filter(function(d) { return d.hof == "n" })<br />
+      .attr("class", "dot")<br />
+      .attr("r", 5)<br />
+      .attr("cx", xMap)<br />
+      .attr("cy", yMap)<br />
+      .style("fill", "#B8B8B8")<br />
+      .style("stroke", "#A3A3A3")<br />
+      .on("mouseover", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(200)<br />
+               .style("opacity", .9);<br />
+                  tooltip.html(d["name"] + "&lt;br/&gt;" + yValue(d) + " time Pro Bowl " <br />
+          + "&lt;br/&gt;" + xValue(d) + " time All Pro")<br />
+               .style("left", (d3.event.pageX + 5) + "px")<br />
+               .style("top", (d3.event.pageY - 28) + "px");<br />
+      })<br />
+      .on("mouseout", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(500)<br />
+               .style("opacity", 0);<br />
+<br />
+      });<br />
+<br />
+svg.append("text")<br />
+        .attr("dx", 100)<br />
+        .attr("dy", -20)<br />
+        .text(function(d) { return "Junior Seau" });<br />
+<br />
+svg.append("text")<br />
+        .attr("dx", 215)<br />
+        .attr("dy", -20)<br />
+        .text(function(d) { return "Hall of Famers" });<br />
+<br />
+svg.append("text")<br />
+        .attr("dx", 350)<br />
+        .attr("dy", -20)<br />
+        .text(function(d) { return "HOF Contenders" });<br />
+<br />
+svg.append("rect")<br />
+        .attr("x", 335)<br />
+        .attr("y", -30)<br />
+        .attr("width", 10)<br />
+        .attr("height", 10)<br />
+        .style("fill", "#B8B8B8")<br />
+<br />
+svg.append("rect")<br />
+        .attr("x", 200)<br />
+        .attr("y", -30)<br />
+        .attr("width", 10)<br />
+        .attr("height", 10)<br />
+        .style("fill", "#36648B")<br />
+<br />
+svg.append("rect")<br />
+        .attr("x", 75)<br />
+        .attr("y", -30)<br />
+        .attr("width", 10)<br />
+        .attr("height", 10)<br />
+        .style("fill", "#FFD700")<br />
+});<br />
+&lt;/script&gt;<br />
+&lt;script&gt;<br />
+<br />
+var margin2 = {top: 10, right: 70, bottom: 30, left: 30},<br />
+    width2 = 650 - margin2.left - margin2.right,<br />
+    height2 = 400 - margin2.top - margin2.bottom;<br />
+    padding=30;<br />
+<br />
+var x2 = d3.scale.ordinal()<br />
+    .rangeRoundBands([0, width2], .05);<br />
+<br />
+var y2 = d3.scale.linear()<br />
+    .range([height2, 0])<br />
+<br />
+var xAxis2 = d3.svg.axis()<br />
+    .scale(x2)<br />
+    .orient("bottom")<br />
+    .tickValues(d3.range(1990, 2015, 3));<br />
+<br />
+var yAxis2 = d3.svg.axis()<br />
+    .scale(y2)<br />
+    .orient("left");<br />
+<br />
+var yLine2 = d3.svg.axis()<br />
+    .scale(y2)<br />
+    .orient("left")<br />
+    .tickFormat(function (d) { return ''; })<br />
+    .tickSize(-width2).tickPadding(8);;<br />
+<br />
+var tip = d3.tip()<br />
+  .attr('class', 'd3-tip2')<br />
+  .offset([-10, 0])<br />
+  .html(function(d) {<br />
+    return d.letter + " DVOA: " + d.DVOA;<br />
+  })<br />
+<br />
+var svg2 = d3.select(".dvoa").append("svg")<br />
+    .attr("width", width2 + margin2.left + margin2.right)<br />
+    .attr("height", height2 + margin2.top + margin2.bottom)<br />
+  .append("g")<br />
+    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");<br />
+<br />
+svg2.call(tip);<br />
+<br />
+d3.tsv("data.tsv", type, function(error, data) {<br />
+  x2.domain(data.map(function(d) { return d.letter; }), -1);<br />
+  y2.domain([21, d3.min(data, function(d) { return d.DVOA; })]);<br />
+  <br />
+  svg2.append("g")<br />
+      .attr("class", "y axis3")<br />
+      .attr("transform", "translate(0," + height2 + ")")<br />
+      .call(xAxis2);<br />
+<br />
+  svg2.append("g")<br />
+      .attr("class", "y axis2")<br />
+      .call(yAxis2)<br />
+    .append("text")<br />
+      .attr("transform", "rotate(-90)")<br />
+      .attr("y", 6)<br />
+      .attr("dy", ".71em") <br />
+      .style("text-anchor", "end")<br />
+<br />
+  svg2.append("g")<br />
+      .attr("class", "y axis2")<br />
+      .call(yLine2);<br />
+<br />
+  svg2.selectAll(".bar")<br />
+      .data(data)<br />
+    .enter().append("rect")<br />
+      .attr("class", function(d) { return d.DVOA &lt; 0 ? "bar negative" : "bar positive"; })<br />
+      .attr("x", function(d) { return x2(d.letter); })<br />
+      .attr("width", x2.rangeBand())<br />
+      .attr("y", function(d) { return y2(Math.min(0, d.DVOA)); })<br />
+      .attr("height", function(d) { return Math.abs(y2(d.DVOA) - y2(0)); })<br />
+      .on('mouseover', tip.show)<br />
+      .on('mouseout', tip.hide)<br />
+<br />
+<br />
+svg2.append("line")<br />
+    .style("stroke", "grey") <br />
+    .attr("x1", 555)<br />
+    .attr("y1", 185) <br />
+    .attr("x2", 555) <br />
+    .attr("y2", 110);<br />
+<br />
+//make upward triange<br />
+svg2.append("path")          <br />
+    .style("stroke", "grey") <br />
+    .style("fill", "grey")     <br />
+    .attr("d", "M 555,108, L 550,118, L 560,118 Z"); <br />
+//make downward triange<br />
+svg2.append("path")         <br />
+    .style("stroke", "grey")<br />
+    .style("fill", "grey")    <br />
+    .attr("d", "M 555,193, L 550,185, L 560,185 Z")<br />
+<br />
+svg2.append("text")<br />
+        .attr("dx", 535)<br />
+        .attr("dy", 85)<br />
+        .text(function(d) { return "stronger" });<br />
+<br />
+svg2.append("text")<br />
+        .attr("dx", 535)<br />
+        .attr("dy", 95)<br />
+        .text(function(d) { return "defense" });<br />
+<br />
+svg2.append("text")<br />
+        .attr("dx", 535)<br />
+        .attr("dy", 215)<br />
+        .text(function(d) { return "weaker" });<br />
+<br />
+svg2.append("text")<br />
+        .attr("dx", 535)<br />
+        .attr("dy", 225)<br />
+        .text(function(d) { return "defense" });<br />
+<br />
+});<br />
+<br />
+function type(d) {<br />
+  d.DVOA = +d.DVOA;<br />
+  return d;<br />
+}<br />
+<br />
+&lt;/script&gt;<br />
+&lt;script&gt;<br />
+var margin3 = {top: 20, right: 0, bottom: 0, left: 0},<br />
+    width3 = 490 - margin3.left - margin3.right,<br />
+    height3 = 933 - margin3.top - margin3.bottom;<br />
+<br />
+&lt;/script&gt;<br />
+	&lt;/body&gt;<br />
+&lt;/html&gt;<br />

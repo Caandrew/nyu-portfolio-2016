@@ -1,0 +1,746 @@
+&lt;!DOCTYPE html&gt;<br />
+&lt;meta charset="utf-8"&gt;<br />
+<br />
+&lt;html&gt;<br />
+&lt;head&gt;<br />
+&lt;link rel="stylesheet" type="text/css" href="style.css"&gt;<br />
+&lt;/head&gt;<br />
+&lt;body&gt;<br />
+&lt;div class="wrap"&gt;<br />
+&lt;div class="title"&gt;&lt;h1&gt;Reduced Federal Drug Sentences&lt;/h1&gt;Of 17,446 applications for reduced sentences, 13,187 were granted. In this graphic, we explore how many sentences were reduced by the state where the prisoner was convicted. We also break down those convictions by drug type and the inmate's race, citizenship status and gender.&lt;/br&gt;&lt;/div&gt;<br />
+  &lt;div class="map"&gt;&lt;div id="tooltip-container"; style = "display:none"&gt;&lt;/div&gt;&lt;/div&gt;<br />
+  <br />
+  &lt;div class="drugs"&gt;&lt;h1&gt;Convictions by Drug Type&lt;/h1&gt;&lt;/div&gt;<br />
+  &lt;div class="race"&gt;&lt;h1&gt;Convictions by Race&lt;/h1&gt;&lt;/div&gt;<br />
+  &lt;div class="citi"&gt;&lt;h1&gt;Convictions by Citizenship Status&lt;/h1&gt;&lt;/div&gt;<br />
+  &lt;div class="bar"&gt;&lt;h1&gt;Convictions by Gender&lt;/h1&gt;&lt;/div&gt;<br />
+  &lt;div class="credits"&gt;Sources: United States Sententencing Commission &lt;/br&gt;Credit: Cynthia Andrews/NBC&lt;/div&gt; <br />
+&lt;/div&gt;<br />
+&lt;/body&gt;<br />
+&lt;script src="http://d3js.org/d3.v3.min.js"&gt;&lt;/script&gt;<br />
+&lt;script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"&gt;&lt;/script&gt;<br />
+&lt;script src="http://d3js.org/topojson.v1.min.js"&gt;&lt;/script&gt;<br />
+&lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"&gt;&lt;/script&gt;<br />
+<br />
+&lt;script&gt;<br />
+<br />
+d3.csv("data3.csv", function(err, data) {<br />
+  var config = {"color1":"#A8D4EE","color2":"#28566F","statecolumn":"state","valuecolumn":"number_granted"}<br />
+  <br />
+  var WIDTH4 = 650;<br />
+<br />
+  var HEIGHT4 = 400;<br />
+  <br />
+  var COLOR_COUNTS = 20;<br />
+  <br />
+  var SCALE = 0.7;<br />
+  <br />
+  function Interpolate(start, end, steps, count) {<br />
+      var s = start,<br />
+          e = end,<br />
+          final = s + (((e - s) / steps) * count);<br />
+      return Math.floor(final);<br />
+  }<br />
+  <br />
+  function Color(_r, _g, _b) {<br />
+      var r, g, b;<br />
+      var setColors = function(_r, _g, _b) {<br />
+          r = _r;<br />
+          g = _g;<br />
+          b = _b;<br />
+      };<br />
+  <br />
+      setColors(_r, _g, _b);<br />
+      this.getColors = function() {<br />
+          var colors = {<br />
+              r: r,<br />
+              g: g,<br />
+              b: b<br />
+          };<br />
+          return colors;<br />
+      };<br />
+  }<br />
+  <br />
+  function hexToRgb(hex) {<br />
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);<br />
+      return result ? {<br />
+          r: parseInt(result[1], 16),<br />
+          g: parseInt(result[2], 16),<br />
+          b: parseInt(result[3], 16)<br />
+      } : null;<br />
+  }<br />
+  <br />
+  function valueFormat(d) {<br />
+    if (d &gt; 1000000000) {<br />
+      return Math.round(d / 1000000000 * 10) / 10 + "B";<br />
+    } else if (d &gt; 1000000) {<br />
+      return Math.round(d / 1000000 * 10) / 10 + "M";<br />
+    } else if (d &gt; 1000) {<br />
+      return Math.round(d / 1000 * 10) / 10 + "K";<br />
+    } else {<br />
+      return d;<br />
+    }<br />
+  }<br />
+  <br />
+  var COLOR_FIRST = config.color1, COLOR_LAST = config.color2;<br />
+  <br />
+  var rgb = hexToRgb(COLOR_FIRST);<br />
+  <br />
+  var COLOR_START = new Color(rgb.r, rgb.g, rgb.b);<br />
+  <br />
+  rgb = hexToRgb(COLOR_LAST);<br />
+  var COLOR_END = new Color(rgb.r, rgb.g, rgb.b);<br />
+  <br />
+  var MAP_STATE = config.statecolumn;<br />
+  var MAP_VALUE = config.valuecolumn;<br />
+  <br />
+  var width5 = WIDTH4,<br />
+      height5 = HEIGHT4;<br />
+  <br />
+  var valueById = d3.map();<br />
+  <br />
+  var startColors = COLOR_START.getColors(),<br />
+      endColors = COLOR_END.getColors();<br />
+  <br />
+  var colors3 = [];<br />
+  <br />
+  for (var i = 0; i &lt; COLOR_COUNTS; i++) {<br />
+    var r = Interpolate(startColors.r, endColors.r, COLOR_COUNTS, i);<br />
+    var g = Interpolate(startColors.g, endColors.g, COLOR_COUNTS, i);<br />
+    var b = Interpolate(startColors.b, endColors.b, COLOR_COUNTS, i);<br />
+    colors3.push(new Color(r, g, b));<br />
+  }<br />
+  <br />
+  var quantize = d3.scale.quantize()<br />
+      .domain([0, 1.0])<br />
+      .range(d3.range(COLOR_COUNTS).map(function(i) { return i }));<br />
+  <br />
+  var path4 = d3.geo.path();<br />
+  <br />
+  var svg5 = d3.select(".map").append("svg")<br />
+      .attr("width", width5)<br />
+      .attr("height", height5);<br />
+  <br />
+  d3.csv("states.csv", function(error, names) {<br />
+  <br />
+  name_id_map = {};<br />
+  id_name_map = {};<br />
+  <br />
+  for (var i = 0; i &lt; names.length; i++) {<br />
+    name_id_map[names[i].name] = names[i].id;<br />
+    id_name_map[names[i].id] = names[i].name;<br />
+  }<br />
+  <br />
+  data.forEach(function(d) {<br />
+    var id = name_id_map[d[MAP_STATE]];<br />
+    valueById.set(id, +d[MAP_VALUE]); <br />
+  });<br />
+  <br />
+  quantize.domain([d3.min(data, function(d){ return +d[MAP_VALUE] }),<br />
+    d3.max(data, function(d){ return +d[MAP_VALUE] })]);<br />
+  <br />
+  d3.json("https://s3-us-west-2.amazonaws.com/vida-public/geo/us.json", function(error, us) {<br />
+    svg5.append("g")<br />
+        .attr("class", "states-choropleth")<br />
+      .selectAll("path")<br />
+        .data(topojson.feature(us, us.objects.states).features)<br />
+      .enter().append("path")<br />
+        .attr("transform", "scale(" + SCALE + ")")<br />
+        .style("fill", function(d) {<br />
+          if (valueById.get(d.id)) {<br />
+            var i = quantize(valueById.get(d.id));<br />
+            var color3 = colors3[i].getColors();<br />
+            return "rgb(" + color3.r + "," + color3.g +<br />
+                "," + color3.b + ")";<br />
+          } else {<br />
+            return "";<br />
+          }<br />
+        })<br />
+        .attr("d", path4)<br />
+        .on("mousemove", function(d) {<br />
+            var html = "";<br />
+  <br />
+            html += "&lt;div class=\"tooltip_kv\"&gt;";<br />
+            html += "&lt;span class=\"tooltip_key\"&gt;";<br />
+            html += id_name_map[d.id] + ":";<br />
+            html += "&lt;/span&gt;";<br />
+            html += "&lt;span class=\"tooltip_value\"&gt;";<br />
+            html += (valueById.get(d.id) ? valueFormat(valueById.get(d.id)) : "");<br />
+            html += "";<br />
+            html += "&lt;/span&gt;";<br />
+            html += "&lt;/div&gt;";<br />
+            <br />
+            $("#tooltip-container").html(html);<br />
+            $(this).attr("fill-opacity", "0.8");<br />
+            $("#tooltip-container").show();<br />
+            <br />
+            var coordinates = d3.mouse(this);<br />
+            <br />
+            var map_width = $('.states-choropleth')[0].getBoundingClientRect().width;<br />
+            <br />
+            if (d3.event.layerX &lt; map_width / 2) {<br />
+              d3.select("#tooltip-container")<br />
+                .style("top", (d3.event.layerY + 15) + "px")<br />
+                .style("left", (d3.event.layerX + 15) + "px");<br />
+            } else {<br />
+              var tooltip_width = $("#tooltip-container").width();<br />
+              d3.select("#tooltip-container")<br />
+                .style("top", (d3.event.layerY + 15) + "px")<br />
+                .style("left", (d3.event.layerX - tooltip_width - 30) + "px");<br />
+            }<br />
+        })<br />
+        .on("mouseout", function() {<br />
+                $(this).attr("fill-opacity", "1.0");<br />
+                $("#tooltip-container").hide();<br />
+            });<br />
+  <br />
+      svg5.append("path4")<br />
+        .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))<br />
+        .attr("class", "states")<br />
+        .attr("transform", "scale(" + SCALE + ")")<br />
+        .attr("d", path4);<br />
+    svg5.append("path")<br />
+        .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))<br />
+        .attr("class", "states")<br />
+        .attr("transform", "scale(" + SCALE + ")")<br />
+        .attr("d", path4);<br />
+    <br />
+    svg5.append("text")<br />
+        .attr("dx", 50)<br />
+        .attr("dy", 375)<br />
+        .attr("class", "label")<br />
+        .text(function(d) {return "** Mouseover or tap a state to see the number of sentences reduced."});<br />
+<br />
+    svg5.append("text")<br />
+      .attr("dx", 290)<br />
+      .attr("dy", 270)<br />
+      .attr("class", "label")<br />
+      .attr("fill", "white")<br />
+      .text(function(d) {return "2,105"});<br />
+<br />
+    svg5.append("text")<br />
+      .attr("dx", 85)<br />
+      .attr("dy", 170)<br />
+      .attr("class", "label")<br />
+      .attr("fill", "white")<br />
+      .text(function(d) {return "571"});<br />
+<br />
+    svg5.append("text")<br />
+      .attr("dx", 500)<br />
+      .attr("dy", 315)<br />
+      .attr("class", "label")<br />
+      .attr("fill", "white")      <br />
+      .text(function(d) {return "863"});<br />
+<br />
+    svg5.append("text")<br />
+      .attr("dx", 350)<br />
+      .attr("dy", 137)<br />
+      .attr("class", "label")<br />
+      .attr("fill", "white")<br />
+      .text(function(d) {return "730"});<br />
+<br />
+    svg5.append("text")<br />
+      .attr("dx", 508)<br />
+      .attr("dy", 180)<br />
+      .attr("class", "label")<br />
+      .attr("fill", "white")<br />
+      .text(function(d) {return "692"});<br />
+<br />
+    svg5.append("text")<br />
+      .attr("dx", 395)<br />
+      .attr("dy", 160)<br />
+      .attr("class", "label")<br />
+      .attr("fill", "white")<br />
+      .text(function(d) {return "660"});<br />
+d3.selectAll("text").style("cursor", "default")<br />
+  });<br />
+  <br />
+  });<br />
+});<br />
+<br />
+<br />
+&lt;/script&gt;<br />
+<br />
+&lt;script&gt;<br />
+  <br />
+var width = 275,<br />
+    height = 300,<br />
+    radius = Math.min(width, height) / 2,<br />
+    innerRadius = 0.1 * radius;<br />
+<br />
+var pie = d3.layout.pie()<br />
+    .sort(null)<br />
+    .value(function(d) { return d.width; });<br />
+<br />
+var arc = d3.svg.arc()<br />
+  .innerRadius(innerRadius)<br />
+  .outerRadius(function (d) { <br />
+    return (radius - innerRadius) * (d.data.percentage / 31.0) + innerRadius; <br />
+  });<br />
+<br />
+var svg = d3.select(".drugs").append("svg")<br />
+    .attr("width", width)<br />
+    .attr("height", height)<br />
+    .append("g")<br />
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");<br />
+<br />
+d3.csv('data.csv', function(error, data) {<br />
+<br />
+  data.forEach(function(d) {<br />
+    d.color  =  d.color;<br />
+    d.width  = +d.percentage;<br />
+  });<br />
+<br />
+<br />
+var path = svg.selectAll(".solidArc")<br />
+      .data(pie(data))<br />
+    .enter().append("path")<br />
+      .attr("fill", function(d) { return d.data.color; })<br />
+      .attr("class", "solidArc")<br />
+      .attr("stroke", "white")<br />
+      .attr("d", arc)<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", -20)<br />
+  .attr("dy", 90)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "#F8F8FF")<br />
+  .text(function(d) {return "27.2%"})<br />
+  ;;<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", -28)<br />
+  .attr("dy", 75)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "#F8F8FF")<br />
+  .text(function(d) {return "Cocaine"})<br />
+  ;;<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", -90)<br />
+  .attr("dy", -20)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "white")<br />
+  .text(function(d) { return "30.9%"})<br />
+  ;<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", -90)<br />
+  .attr("dy", -35)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "white")<br />
+  .text(function(d) { return "Meth"})<br />
+  ;<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", 40)<br />
+  .attr("dy", 25)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "white")<br />
+  .text(function(d) {return "20.5%"})<br />
+  ;<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", 14.5)<br />
+  .attr("dy", 10)<br />
+  .attr("class", "labelS")<br />
+  .attr("fill", "white")<br />
+  .text(function(d) {return " Crack Cocaine"})<br />
+  ;;<br />
+<br />
+svg.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1", -6)<br />
+  .attr("y1", -120)<br />
+  .attr("x2", -6)<br />
+  .attr("y2", -40)<br />
+<br />
+svg.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1", -6)<br />
+  .attr("y1", -120)<br />
+  .attr("x2", 38)<br />
+  .attr("y2", -120);<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", 41)<br />
+  .attr("dy", -115)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "4.7%"})<br />
+  ;;<br />
+<br />
+<br />
+svg.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1",10)<br />
+  .attr("y1", -90)<br />
+  .attr("x2", 10)<br />
+  .attr("y2", -55);<br />
+<br />
+svg.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1", 10)<br />
+  .attr("y1", -90)<br />
+  .attr("x2", 38)<br />
+  .attr("y2", -90);<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", 41)<br />
+  .attr("dy", -90)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "9.1%"})<br />
+  ;;<br />
+<br />
+svg.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1",35)<br />
+  .attr("y1", -60)<br />
+  .attr("x2", 35)<br />
+  .attr("y2", -35);<br />
+<br />
+svg.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1", 35)<br />
+  .attr("y1", -60)<br />
+  .attr("x2", 38)<br />
+  .attr("y2", -60)<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", 41)<br />
+  .attr("dy", -60)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "7.6%"})<br />
+  ;;<br />
+<br />
+svg.append("text")<br />
+  .attr("dx", 77)<br />
+  .attr("dy", -115)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "Other"})<br />
+  ;;<br />
+svg.append("text")<br />
+  .attr("dx", 77)<br />
+  .attr("dy", -90)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "Marijuana"})<br />
+  ;;<br />
+svg.append("text")<br />
+  .attr("dx", 77)<br />
+  .attr("dy", -60)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "Heroin"})<br />
+  ;;<br />
+d3.selectAll("text").style("cursor", "default")<br />
+});<br />
+<br />
+&lt;/script&gt;<br />
+&lt;script&gt;<br />
+var width2 = 275,<br />
+    height2 = 300,<br />
+    radius2 = Math.min(width2, height2) / 2,<br />
+    innerRadius2 = 0.1 * radius2;<br />
+<br />
+var pie2 = d3.layout.pie()<br />
+    .sort(null)<br />
+    .value(function(d) { return d.width; });<br />
+<br />
+var arc2 = d3.svg.arc()<br />
+  .innerRadius(innerRadius2)<br />
+  .outerRadius(function (d) { <br />
+    return (radius2 - innerRadius2) * (d.data.racepercent / 40.0) + innerRadius2; <br />
+  });<br />
+<br />
+var svg2 = d3.select(".race").append("svg")<br />
+    .attr("width", width2)<br />
+    .attr("height", height2)<br />
+    .append("g")<br />
+    .attr("transform", "translate(" + width2 / 2 + "," + height2 / 2 + ")");<br />
+<br />
+d3.csv('data.csv', function(error, data) {<br />
+<br />
+  data.forEach(function(d) {<br />
+    d.color  =  d.racecolor;<br />
+    d.width  = +d.racepercent;<br />
+  });<br />
+  <br />
+var path2 = svg2.selectAll(".solidArc")<br />
+      .data(pie2(data))<br />
+    .enter().append("path")<br />
+      .attr("fill", function(d) { return d.data.color; })<br />
+      .attr("class", "solidArc")<br />
+      .attr("stroke", "white")<br />
+      .attr("d", arc2)<br />
+<br />
+svg2.append("text")<br />
+  .attr("dx", 10)<br />
+  .attr("dy", 70)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "#F8F8FF")<br />
+  .text(function(d) {return "34.4%"})<br />
+  ;;<br />
+<br />
+svg2.append("text")<br />
+  .attr("dx", -90)<br />
+  .attr("dy", -10)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "white")<br />
+  .text(function(d) { return "38.4%"})<br />
+  ;  <br />
+<br />
+svg2.append("text")<br />
+  .attr("dx", 20)<br />
+  .attr("dy", -30)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "white")<br />
+  .text(function(d) {return "24.2%"})<br />
+  ;;<br />
+<br />
+svg2.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1", -12)<br />
+  .attr("y1", -120)<br />
+  .attr("x2", -3)<br />
+  .attr("y2", -30)<br />
+<br />
+svg2.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1", -12)<br />
+  .attr("y1", -120)<br />
+  .attr("x2", 38)<br />
+  .attr("y2", -120)<br />
+<br />
+svg2.append("text")<br />
+  .attr("dx", 45)<br />
+  .attr("dy", -115)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "3%"})<br />
+  ;;<br />
+<br />
+svg2.append("text")<br />
+  .attr("dx", -25)<br />
+  .attr("dy", 55)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "#F8F8FF")<br />
+  .text(function(d) {return "African American"})<br />
+  ;;<br />
+svg2.append("text")<br />
+  .attr("dx", -95)<br />
+  .attr("dy", -25)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "white")<br />
+  .text(function(d) { return "Hispanic"})<br />
+  ;<br />
+<br />
+svg2.append("text")<br />
+  .attr("dx", 3)<br />
+  .attr("dy", -45)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "white")<br />
+  .text(function(d) {return "Caucasian"})<br />
+  ;;<br />
+svg2.append("text")<br />
+  .attr("dx", 80)<br />
+  .attr("dy", -115)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "Other"})<br />
+  ;;<br />
+<br />
+d3.selectAll("text").style("cursor", "default")<br />
+});<br />
+<br />
+&lt;/script&gt;<br />
+&lt;script&gt;<br />
+<br />
+var width3 = 275,<br />
+    height3 = 300,<br />
+    radius3 = Math.min(width3, height3) / 2,<br />
+    innerRadius3 = 0.1 * radius3;<br />
+<br />
+var pie3 = d3.layout.pie()<br />
+    .sort(null)<br />
+    .value(function(d) { return d.width; });<br />
+<br />
+var arc3 = d3.svg.arc()<br />
+  .innerRadius(innerRadius3)<br />
+  .outerRadius(function (d) { <br />
+    return (radius3 - innerRadius3) * (d.data.citpercent / 85.0) + innerRadius3; <br />
+  });<br />
+<br />
+var svg3 = d3.select(".citi").append("svg")<br />
+    .attr("width", width3)<br />
+    .attr("height", height3)<br />
+    .append("g")<br />
+    .attr("transform", "translate(" + width3 / 2 + "," + height3 / 2 + ")");<br />
+<br />
+d3.csv('data.csv', function(error, data) {<br />
+<br />
+  data.forEach(function(d) {<br />
+    d.color  =  d.citcolor;<br />
+    d.width  = +d.citpercent;<br />
+  });<br />
+  <br />
+var path3 = svg3.selectAll(".solidArc")<br />
+      .data(pie3(data))<br />
+    .enter().append("path")<br />
+      .attr("fill", function(d) { return d.data.color; })<br />
+      .attr("class", "solidArc")<br />
+      .attr("stroke", "white")<br />
+      .attr("d", arc3)<br />
+<br />
+svg3.append("text")<br />
+  .attr("dx", 10)<br />
+  .attr("dy", 70)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "#F8F8FF")<br />
+  .text(function(d) {return "76.5%"})<br />
+  ;<br />
+<br />
+svg3.append("text")<br />
+  .attr("dx", -90)<br />
+  .attr("dy", -60)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "23.5%"})<br />
+    <br />
+<br />
+svg3.append("text")<br />
+  .attr("dx", 5)<br />
+  .attr("dy", 55)<br />
+  .attr("class", "label")<br />
+  .attr("fill", "#F8F8FF")<br />
+  .text(function(d) {return "Citizens"})<br />
+  ;<br />
+<br />
+svg3.append("text")<br />
+  .attr("dx", -110)<br />
+  .attr("dy", -75)<br />
+  .attr("class", "label")<br />
+  .text(function(d) {return "Non-Citizens"})<br />
+  ;<br />
+<br />
+<br />
+svg3.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1", -40)<br />
+  .attr("y1", -65)<br />
+  .attr("x2", -30)<br />
+  .attr("y2", -65)<br />
+<br />
+svg3.append("line")<br />
+  .style("stroke", "grey")<br />
+  .attr("x1", -30)<br />
+  .attr("y1", -65)<br />
+  .attr("x2", -30)<br />
+  .attr("y2", -45)<br />
+<br />
+<br />
+d3.selectAll("text").style("cursor", "default")<br />
+});<br />
+<br />
+&lt;/script&gt;<br />
+&lt;script&gt;<br />
+<br />
+var margin = {top: 40, right: 40, bottom: 75, left: 45},<br />
+    width4 = 300 - margin.left - margin.right,<br />
+    height4 = 300 - margin.top - margin.bottom;<br />
+<br />
+var x0 = d3.scale.ordinal()<br />
+    .rangeRoundBands([0, width4], .1);<br />
+<br />
+var x1 = d3.scale.ordinal();<br />
+<br />
+var y = d3.scale.linear()<br />
+    .range([height4, 0]);<br />
+<br />
+var color = d3.scale.ordinal()<br />
+    .range(["#28566F", "#E27660"]);<br />
+<br />
+var xAxis = d3.svg.axis()<br />
+    .scale(x0)<br />
+    .orient("bottom")<br />
+<br />
+var yAxis = d3.svg.axis()<br />
+    .scale(y)<br />
+    .orient("left")<br />
+    .ticks(6)<br />
+    .tickFormat(d3.format("%"))<br />
+<br />
+var svg4 = d3.select(".bar").append("svg")<br />
+    .attr("width", width4 + margin.left + margin.right)<br />
+    .attr("height", height4 + margin.top + margin.bottom)<br />
+  .append("g")<br />
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");<br />
+<br />
+d3.csv("data2.csv", function(error, data) {<br />
+  if (error) throw error;<br />
+<br />
+  var drugNames = d3.keys(data[0]).filter(function(key) { return key !== "Drug"; });<br />
+<br />
+  data.forEach(function(d) {<br />
+    d.drugs = drugNames.map(function(name) { return {name: name, value: +d[name]}; });<br />
+  });<br />
+<br />
+  x0.domain(data.map(function(d) { return d.Drug; }));<br />
+  x1.domain(drugNames).rangeRoundBands([0, x0.rangeBand()]);<br />
+  y.domain([0, 1]);<br />
+<br />
+  svg4.append("g")<br />
+      .attr("class", "x axis")<br />
+      .attr("transform", "translate(0," + height4 + ")")<br />
+      .call(xAxis)    <br />
+    .selectAll("text")<br />
+      .attr("y", 9)<br />
+      .attr("x", 4)<br />
+      .attr("dy", ".35em")<br />
+      .attr("class", "p")<br />
+      .attr("transform", "rotate(45)")<br />
+      .style("text-anchor", "start")<br />
+      ;;<br />
+  <br />
+  svg4.append("g")<br />
+      .attr("class", "axis")<br />
+      .call(yAxis)<br />
+        ;<br />
+<br />
+  var Drug = svg4.selectAll(".Drug")<br />
+      .data(data)<br />
+    .enter().append("g")<br />
+      .attr("class", "g")<br />
+      .attr("transform", function(d) { return "translate(" + x0(d.Drug) + ",0)"; });<br />
+<br />
+  Drug.selectAll("rect")<br />
+      .data(function(d) { return d.drugs; })<br />
+    .enter().append("rect")<br />
+      .attr("width", x1.rangeBand())<br />
+      .attr("x", function(d) { return x1(d.name); })<br />
+      .attr("y", function(d) { return y(d.value); })<br />
+      .attr("height", function(d) { return height4 - y(d.value); })<br />
+      .style("fill", function(d) { return color(d.name); });<br />
+<br />
+  var legend = svg4.selectAll(".legend")<br />
+      .data(drugNames.slice().reverse())<br />
+    .enter().append("g")<br />
+      .attr("class", "legend")<br />
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })<br />
+      ;;<br />
+<br />
+  legend.append("rect")<br />
+      .attr("x", width4 - 18)<br />
+      .attr("y", -35)      <br />
+      .attr("width", 18)<br />
+      .attr("height", 18)<br />
+      .style("fill", color);<br />
+<br />
+  legend.append("text")<br />
+      .attr("x", width4 - 24)<br />
+      .attr("y", -25)<br />
+      .attr("dy", ".35em")<br />
+      .style("text-anchor", "end")<br />
+      .text(function(d) { return d; });<br />
+<br />
+d3.selectAll("text").style("cursor", "default")<br />
+});<br />
+<br />
+&lt;/script&gt;<br />
+<br />
+&lt;/body&gt;<br />
+&lt;/html&gt;

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </head>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+  </head>
+  <div class = "wrap">
+	<div class= "main">
+  <div class = "buttons">
+      <ul class="pagination">
+      <li ><a href="galatolo.html">Galatolo</a></li>
+      <li ><a href="blackwood.html">Blackwood</a></li>
+      <li ><a href="keller.html">Keller</a></li>
+      <li ><a href="claire.html">Claire</a></li>
+      <li class="active"><a href="stroud.html">Stroud</a></li>
+    </ul>
+  </div> 
+  </div>
+<div class="credits">Credits: Cynthia Andrews / NBC</br>Source: San Mateo Community College District</div>    	</div>
+<script>
+
+var margin = {top: 20, right: 40, bottom: 90, left: 40},
+    width = 970 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .rangeRound([height, 0]);
+
+var color = d3.scale.ordinal()
+    .range(["4A5E40", "ACCD9D","DBDBDA"]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
+
+var tooltip = d3.select(".main").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+var svg = d3.select(".main").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+
+
+d3.tsv("data5.tsv", function(error, data) {
+  if (error) throw error;
+
+
+
+  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Dates"; }));
+
+  data.forEach(function(d) {
+
+  	var descrip = d.descrip;
+  	var descrip2 = d.descrip2;  
+  	var descrip3 = d.descrip3;
+  	var descrip4 = d.descrip4;
+  	var descrip5 = d.descrip5; 
+    var descrip6 = d.descrip6; 
+  	var sum = d.sum;
+    var alcohol = d.alcohol;
+    var descrip6 = d.descrip6;
+    var y0 = 0;
+    d.spending = color.domain().map(function(name) { return {descrip: descrip, descrip2: descrip2, descrip3: descrip3, descrip4: descrip4, descrip5: descrip5, descrip6: descrip6, alcohol:alcohol, sum: sum, descrip6:descrip6, name: name, y0: y0, y1: y0 += +d[name]}; });
+  });
+
+
+  x.domain(data.map(function(d) { return d.Dates; }));
+  y.domain([0, 4000]);
+
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+
+  var Dates = svg.selectAll(".Dates")
+      .data(data)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x(d.Dates) + ",0)"; });
+
+
+  Dates.selectAll(".rect")
+      .data(function(d) { return d.spending; })
+    .enter().append("rect")
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.y1); })
+      .attr("height", function(d) { return y(d.y0) - y(d.y1); })
+      .style("fill", function(d) { return color(d.name)})
+      .on("mouseover", function(d) {								
+          tooltip.transition()
+               .duration(200)
+               .attr("width", 50)
+               .style("opacity", .9)
+               .style("cursor", "pointer");
+               tooltip.html(d.descrip + ":"+"</br>" + "</br>" + d.descrip2+ "</br>" + "</br>" + d.descrip3+ "</br>" + "</br>" + d.descrip4+ "</br>" + "</br>" + d.descrip5+ "</br>" + "</br>" + d.descrip6+ "</br>"+ "</br>"+ "<strong>Total Expensed: </strong>"+ "$" + d.sum)
+               .style("left", (d3.event.pageX - 75) + "px")
+               .style("top", (d3.event.pageY - 280) + "px")
+
+               d3.select(this).style("fill", "#B19330")
+
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0),
+               d3.select(this).style("fill", function(d) { return color(d.name)})
+      });
+
+
+
+  
+
+    svg.append("rect")
+      .attr("x", width - 875)
+      .attr("y", 0)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", "4A5E40");
+
+  svg.append("rect")
+      .attr("x", width - 875)
+      .attr("y", 25)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", "ACCD9D");
+
+  svg.append("rect")
+      .attr("x", width - 875)
+      .attr("y", 50)      
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", "DBDBDA");
+         
+  svg.append("text")
+      .attr("x", width - 845)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "start")
+      .text(function(d) { return "Meals & Entertainment"; });
+
+
+  svg.append("text")
+      .attr("x", width - 845)
+      .attr("y", 34)
+      .attr("dy", ".35em")
+      .style("text-anchor", "start")
+      .text(function(d) { return "Hotels, Travel & Conferences"; });
+
+
+  svg.append("text")
+      .attr("x", width - 845)
+      .attr("y", 59)
+      .attr("dy", ".35em")
+      .style("text-anchor", "start")
+      .text(function(d) { return "Misc."; });      
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 0)
+        .attr("y1", 400)
+        .attr("x2", 0)
+        .attr("y2", 395)
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 0)
+        .attr("y1", 400)
+        .attr("x2", 299)
+        .attr("y2", 400)
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 299)
+        .attr("y1", 400)
+        .attr("x2", 299)
+        .attr("y2", 395)
+
+  svg.append("text")
+      .attr("x", 150)
+      .attr("y", 415)
+      .attr("class", "p")
+      .text("2012")
+
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 302)
+        .attr("y1", 400)
+        .attr("x2", 302)
+        .attr("y2", 395)
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 302)
+        .attr("y1", 400)
+        .attr("x2", 564)
+        .attr("y2", 400)
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 564)
+        .attr("y1", 400)
+        .attr("x2", 564)
+        .attr("y2", 395)
+
+  svg.append("text")
+      .attr("x", 450)
+      .attr("y", 415)
+      .attr("class", "p")
+      .text("2013")
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 568)
+        .attr("y1", 400)
+        .attr("x2", 568)
+        .attr("y2", 395)
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 568)
+        .attr("y1", 400)
+        .attr("x2", 880)
+        .attr("y2", 400)
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 880)
+        .attr("y1", 400)
+        .attr("x2", 880)
+        .attr("y2", 395)
+
+  svg.append("text")
+      .attr("x", 720)
+      .attr("y", 415)
+      .attr("class", "p")
+      .text("2014")
+
+});
+</script>

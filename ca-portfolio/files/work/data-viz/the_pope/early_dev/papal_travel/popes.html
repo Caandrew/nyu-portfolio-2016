@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script>
+
+var margin1 = {top: 40, right: 40, bottom: 50, left: 40},
+    width = 960 - margin1.left - margin1.right,
+    height = 500 - margin1.top - margin1.bottom;
+
+var x2 = d3.scale.linear()
+    .domain([1963,2016])
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .domain([0,16])
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x2)
+    .orient("bottom")
+    .tickSize(-height)
+    .tickFormat(d3.format("d"))
+    .tickValues(d3.range(1964, 2016, 3));
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickSize(-width)
+    .tickValues(d3.range(0, 18, 2));
+
+var svg1 = d3.select("body").append("svg")
+    .attr("width", width + margin1.left + margin1.right)
+    .attr("height", height + margin1.top + margin1.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+
+d3.tsv("travel_data.tsv", function(error, data) {
+  if (error) throw error;
+
+  data.forEach(function(d) {
+    d.destination_count = +d.destination_count;
+    d.year_of_travel = +d.year_of_travel;
+  });
+
+  svg1.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width)
+      .attr("y", -6)
+      .style("text-anchor", "end");
+
+  svg1.append("g")
+      .attr("class", "axis")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end");
+
+svg1.append("text")
+        .attr("dx", 37)
+        .attr("dy", 455)
+        .text(function(d) { return "Pope Paul VI" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 16)
+        .attr("y1", 435)
+        .attr("x2", 117)
+        .attr("y2", 435);
+
+svg1.append("text")
+        .attr("dx", 150)
+        .attr("dy", 455)
+        .text(function(d) { return "Pope John Paul I" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 132)
+        .attr("y1", 435)
+        .attr("x2", 250)
+        .attr("y2", 435);
+
+svg1.append("text")
+        .attr("dx", 425)
+        .attr("dy", 455)
+        .text(function(d) { return "Pope John Paul II" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 265)
+        .attr("y1", 435)
+        .attr("x2", 680)
+        .attr("y2", 435);
+
+svg1.append("text")
+        .attr("dx", 715)
+        .attr("dy", 455)
+        .text(function(d) { return "Pope Benedict XVI" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 697)
+        .attr("y1", 435)
+        .attr("x2", 813)
+        .attr("y2", 435);
+
+svg1.append("text")
+        .attr("dx", 818)
+        .attr("dy", 455)
+        .text(function(d) { return "Pope Francis" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 830)
+        .attr("y1", 435)
+        .attr("x2", 865)
+        .attr("y2", 435);
+
+  svg1.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("r", function(d) { return d.destination_count; })
+      .attr("cx", function(d) { return x(d.year_of_travel); })
+      .attr("cy", function(d) { return y(d.destination_count); })
+      .style("fill", function(d) { return d.color_code; })
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html("Pope: " + d["pope"] + "<br/>"+ "Year: " + d["year_of_travel"])
+               .style("left", (d3.event.pageX - 55) + "px")
+               .style("top", (d3.event.pageY + 10) + "px")
+               d3.select(this).style("fill", "#D8472A");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0),
+               d3.select(this).style("fill", d.color_code);
+
+      });
+
+});
+
+</script>

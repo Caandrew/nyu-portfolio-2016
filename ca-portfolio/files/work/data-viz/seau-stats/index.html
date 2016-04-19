@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		 <link rel="stylesheet" href="style.css">
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+	</head>
+	<body>
+		<div id="wrap">
+            <div class="dvoaHEAD">
+            <h1> Seau's Effect on the Chargers' Defense</h1>
+            <p>From 1990-2002, the time period for which Seau was a San Diego Charger, the team had a visibly stronger defense. The average DVOA* during Seau's tenure was <span class="better">-0.38</span>, almost eight times stronger than the post-Seau average of <span class="worse">3.02</span>. 
+          	<div class="dvoa"></div>
+            
+            
+            <p class="foot">* Developed by <a href="http://www.footballoutsiders.com/">Football Outsiders</a> the <a href="http://www.footballoutsiders.com/info/methods#DVOA">Defense-adjusted Value Over Average</a> or "DVOA" is a statistic that "measures a team's efficiency by comparing success on every single play to a league average based on situation and opponent" and effectively shows the strength of a given team's defense during a given season.</p>
+          
+            
+            <h1 class="spacer"> How Seau Stacks Up Against Other Notable Linebackers</h1>
+            <p>With more career Pro-Bowl selections than any other inductee, as well as an impressive number of First-Team All-Pro selections, Junior Seau stands out when compared to other Hall of Fame linebackers and potential HOFers alike.
+            </p>
+        	<div class="scatter"></div>
+     		<div style="clear:both"></div>
+     		<div class="credits">Credits: Cynthia Andrews / NBC</div>
+     		<div class="credits">Sources: Football Outsiders, Pro-Football-Reference.com, The Elias Sports Bureau</div>
+     	</div>
+
+
+		<script>
+var margin = {top: 35, right: 40, bottom: 50, left: 45},
+	width = 650 - margin.left - margin.right,
+	height = 400 - margin.top - margin.bottom;
+
+/* 
+ * value accessor - returns the value to encode for a given data object.
+ * scale - maps value to a visual display encoding, such as a pixel position.
+ * map function - maps from data value to display value
+ * axis - sets up axis
+ */ 
+
+// setup x 
+var xValue = function(d) { return d.ap1;}, // data -> value
+    xScale = d3.scale.linear()
+    .range([0, width]), // value -> display
+    
+    xMap = function(d) { return xScale(xValue(d));}, // data -> display
+    xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(4).tickSize(-height).tickPadding(8);;;
+    xLine = d3.svg.axis().scale(xScale).orient("bottom").tickFormat(function (d) { return ''; });
+
+// setup y
+var yValue = function(d) { return d.pb;}, // data -> value
+    yScale = d3.scale.linear()
+    .range([height, 0]), // value -> display
+    
+    yMap = function(d) { return yScale(yValue(d));}, // data -> display
+    yAxis = d3.svg.axis().scale(yScale).orient("left").tickValues(d3.range(0, 18, 2)).tickSize(-width).tickPadding(6);;
+    yLine = d3.svg.axis().scale(yScale).orient("left").tickFormat(function (d) { return ''; });
+
+// add the graph canvas to the body of the webpage
+var svg = d3.select(".scatter").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// add the tooltip area to the webpage
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+
+// load data
+d3.csv("career.csv", function(error, data) {
+
+  // change string (from CSV) into number format
+  data.forEach(function(d) {
+    d.ap1 = +d.ap1;
+    d["pb (g)"] = +d["pb (g)"];
+//    console.log(d);
+  });
+
+  // don't want dots overlapping axis, so add in buffer to data domain
+  xScale.domain([d3.min(data, xValue)-.5, d3.max(data, xValue)]);
+  yScale.domain([d3.min(data, yValue)-1, 14]);
+
+    // x-grid
+  svg.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width)
+      .attr("y", 35)
+      .style("text-anchor", "end")
+      .text("First-Team All-Pro Selections");
+
+  // y-grid
+  svg.append("g")
+      .attr("class", "axis")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -40)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Career Pro Bowl Selections")
+
+//xaxis
+  svg.append("g")
+      .attr("class", "axis2")
+      .call(xLine)
+      .attr("transform", "translate(0," + height + ")")
+      .style("stroke-width", 1);
+
+//yaxis
+  svg.append("g")
+      .attr("class", "axis2")
+      .call(yLine)
+      .style("stroke-width", 1);
+
+  // draw hof dots
+
+   svg.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+    .filter(function(d) { return d.hof == "seau_hof" })
+      .attr("class", "dot")
+      .attr("r", 5)
+      .attr("cx", xMap)
+      .attr("cy", yMap)
+      .style("fill", "#FFD700")
+      .style("stroke", "#EEC900")
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html(d["name"] + "<br/>" + yValue(d) + " time Pro Bowl " 
+          + "<br/>" + xValue(d) + " time All Pro")
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0);
+
+      });
+
+svg.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+    .filter(function(d) { return d.hof == "y" })
+      .attr("class", "dot")
+      .attr("r", 5)
+      .attr("cx", xMap)
+      .attr("cy", yMap)
+      .style("fill", "#36648B")
+      .style("stroke", "darkblue")
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html(d["name"] + "<br/>" + yValue(d) + " time Pro Bowl " 
+          + "<br/>" + xValue(d) + " time All Pro")
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0);
+
+      });
+//draw non hof dots
+
+   svg.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+    .filter(function(d) { return d.hof == "n" })
+      .attr("class", "dot")
+      .attr("r", 5)
+      .attr("cx", xMap)
+      .attr("cy", yMap)
+      .style("fill", "#B8B8B8")
+      .style("stroke", "#A3A3A3")
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html(d["name"] + "<br/>" + yValue(d) + " time Pro Bowl " 
+          + "<br/>" + xValue(d) + " time All Pro")
+               .style("left", (d3.event.pageX + 5) + "px")
+               .style("top", (d3.event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0);
+
+      });
+
+svg.append("text")
+        .attr("dx", 100)
+        .attr("dy", -20)
+        .text(function(d) { return "Junior Seau" });
+
+svg.append("text")
+        .attr("dx", 215)
+        .attr("dy", -20)
+        .text(function(d) { return "Hall of Famers" });
+
+svg.append("text")
+        .attr("dx", 350)
+        .attr("dy", -20)
+        .text(function(d) { return "HOF Contenders" });
+
+svg.append("rect")
+        .attr("x", 335)
+        .attr("y", -30)
+        .attr("width", 10)
+        .attr("height", 10)
+        .style("fill", "#B8B8B8")
+
+svg.append("rect")
+        .attr("x", 200)
+        .attr("y", -30)
+        .attr("width", 10)
+        .attr("height", 10)
+        .style("fill", "#36648B")
+
+svg.append("rect")
+        .attr("x", 75)
+        .attr("y", -30)
+        .attr("width", 10)
+        .attr("height", 10)
+        .style("fill", "#FFD700")
+});
+</script>
+<script>
+
+var margin2 = {top: 10, right: 70, bottom: 30, left: 30},
+    width2 = 650 - margin2.left - margin2.right,
+    height2 = 400 - margin2.top - margin2.bottom;
+    padding=30;
+
+var x2 = d3.scale.ordinal()
+    .rangeRoundBands([0, width2], .05);
+
+var y2 = d3.scale.linear()
+    .range([height2, 0])
+
+var xAxis2 = d3.svg.axis()
+    .scale(x2)
+    .orient("bottom")
+    .tickValues(d3.range(1990, 2015, 3));
+
+var yAxis2 = d3.svg.axis()
+    .scale(y2)
+    .orient("left");
+
+var yLine2 = d3.svg.axis()
+    .scale(y2)
+    .orient("left")
+    .tickFormat(function (d) { return ''; })
+    .tickSize(-width2).tickPadding(8);;
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip2')
+  .offset([-10, 0])
+  .html(function(d) {
+    return d.letter + " DVOA: " + d.DVOA;
+  })
+
+var svg2 = d3.select(".dvoa").append("svg")
+    .attr("width", width2 + margin2.left + margin2.right)
+    .attr("height", height2 + margin2.top + margin2.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+svg2.call(tip);
+
+d3.tsv("data.tsv", type, function(error, data) {
+  x2.domain(data.map(function(d) { return d.letter; }), -1);
+  y2.domain([21, d3.min(data, function(d) { return d.DVOA; })]);
+  
+  svg2.append("g")
+      .attr("class", "y axis3")
+      .attr("transform", "translate(0," + height2 + ")")
+      .call(xAxis2);
+
+  svg2.append("g")
+      .attr("class", "y axis2")
+      .call(yAxis2)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em") 
+      .style("text-anchor", "end")
+
+  svg2.append("g")
+      .attr("class", "y axis2")
+      .call(yLine2);
+
+  svg2.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", function(d) { return d.DVOA < 0 ? "bar negative" : "bar positive"; })
+      .attr("x", function(d) { return x2(d.letter); })
+      .attr("width", x2.rangeBand())
+      .attr("y", function(d) { return y2(Math.min(0, d.DVOA)); })
+      .attr("height", function(d) { return Math.abs(y2(d.DVOA) - y2(0)); })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+
+
+svg2.append("line")
+    .style("stroke", "grey") 
+    .attr("x1", 555)
+    .attr("y1", 185) 
+    .attr("x2", 555) 
+    .attr("y2", 110);
+
+//make upward triange
+svg2.append("path")          
+    .style("stroke", "grey") 
+    .style("fill", "grey")     
+    .attr("d", "M 555,108, L 550,118, L 560,118 Z"); 
+//make downward triange
+svg2.append("path")         
+    .style("stroke", "grey")
+    .style("fill", "grey")    
+    .attr("d", "M 555,193, L 550,185, L 560,185 Z")
+
+svg2.append("text")
+        .attr("dx", 535)
+        .attr("dy", 85)
+        .text(function(d) { return "stronger" });
+
+svg2.append("text")
+        .attr("dx", 535)
+        .attr("dy", 95)
+        .text(function(d) { return "defense" });
+
+svg2.append("text")
+        .attr("dx", 535)
+        .attr("dy", 215)
+        .text(function(d) { return "weaker" });
+
+svg2.append("text")
+        .attr("dx", 535)
+        .attr("dy", 225)
+        .text(function(d) { return "defense" });
+
+});
+
+function type(d) {
+  d.DVOA = +d.DVOA;
+  return d;
+}
+
+</script>
+<script>
+var margin3 = {top: 20, right: 0, bottom: 0, left: 0},
+    width3 = 490 - margin3.left - margin3.right,
+    height3 = 933 - margin3.top - margin3.bottom;
+
+</script>
+	</body>
+</html>

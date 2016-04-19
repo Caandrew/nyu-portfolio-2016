@@ -1,0 +1,278 @@
+&lt;!DOCTYPE html&gt;<br />
+&lt;html&gt;<br />
+  &lt;head&gt;<br />
+    &lt;link rel="stylesheet" type="text/css" href="style.css"&gt;<br />
+    &lt;meta charset="utf-8"&gt;<br />
+    &lt;script src="http://d3js.org/d3.v3.min.js"&gt;&lt;/script&gt;<br />
+  &lt;/head&gt;<br />
+  &lt;div class = wrap&gt;<br />
+  &lt;div class=main&gt;&lt;/div&gt;<br />
+<br />
+  &lt;body&gt;<br />
+  &lt;script&gt;<br />
+<br />
+  var margin = {top: 25, right: 55, bottom: 45, left: -5},<br />
+    width = 970 - margin.left - margin.right,<br />
+    height = 450 - margin.top - margin.bottom;<br />
+<br />
+  var x = d3.scale.linear()<br />
+    .domain([1947,2020])<br />
+    .range([0, width]);<br />
+<br />
+  var x2 = d3.scale.linear()<br />
+    .domain([1947,2022])<br />
+    .range([0, width]);<br />
+<br />
+  var y = d3.scale.linear()<br />
+    .domain([200,0])<br />
+    .range([0,height]);<br />
+<br />
+  var xAxis = d3.svg.axis()<br />
+    .scale(x)<br />
+    .orient("bottom")<br />
+    .tickFormat(d3.format(" "))<br />
+    .tickSize(-height)<br />
+    .tickValues(d3.range(1947,2016, 10));<br />
+<br />
+  var xAxis2 = d3.svg.axis()<br />
+    .scale(x)<br />
+    .orient("bottom")<br />
+    .tickFormat(d3.format(" "))<br />
+    .tickSize(-height)<br />
+    .tickValues(d3.range(1952,2022, 10));<br />
+<br />
+  var xAxis3 = d3.svg.axis()<br />
+    .scale(x)<br />
+    .orient("bottom")<br />
+    .tickFormat(d3.format(" "))<br />
+    .tickValues(d3.range(0,0,0));<br />
+<br />
+    var yAxis = d3.svg.axis()<br />
+    .scale(y)<br />
+    .orient("left")<br />
+    .tickValues(0,42,1)<br />
+<br />
+<br />
+    var svg = d3.select(".main").append("svg")<br />
+    .attr("width", width + margin.left + margin.right)<br />
+    .attr("height", height + margin.top + margin.bottom)<br />
+    .append("g")<br />
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");<br />
+<br />
+    var tooltip = d3.select("body").append("div")<br />
+    .attr("class", "tooltip")<br />
+    .style("opacity", 0)<br />
+<br />
+  d3.tsv("data.tsv", function(error, data) {<br />
+      if (error) throw error;<br />
+<br />
+  svg.append("g")<br />
+      .attr("class", "axis2")<br />
+      .attr("transform", "translate(0," + 173 + ")")<br />
+      .call(xAxis3)<br />
+<br />
+  svg.append("g")<br />
+      .attr("class", "axis")<br />
+      .attr("transform", "translate(0," + height + ")")<br />
+      .call(xAxis)<br />
+      .selectAll("text")<br />
+      .attr("y", -200)<br />
+      .attr("x", 45)<br />
+      .attr("dy", "1.1em")<br />
+      .style("text-anchor", "start")<br />
+      .style("background-color", "white")<br />
+      .style("font-size", 13);<br />
+  <br />
+  svg.append("g")<br />
+    .attr("class", "axis")<br />
+    .attr("transform", "translate(0," + height + ")")<br />
+    .call(xAxis2)<br />
+    .selectAll("text")<br />
+    .attr("y", -230)<br />
+    .attr("x", 45)<br />
+    .attr("dy", "1.1em")<br />
+    .style("text-anchor", "start")<br />
+      .style("background-color", "white")<br />
+      .style("font-size", 13);<br />
+<br />
+  svg.append("g")<br />
+    .attr("class", "axis3")<br />
+    .attr("transform", "translate(0," + height + ")")<br />
+    .call(xAxis2)<br />
+    .selectAll("text")<br />
+    .attr("y", -230)<br />
+    .attr("x", 45)<br />
+    .attr("dy", "1.1em")<br />
+    .style("text-anchor", "start")<br />
+      .style("font-size", 13);<br />
+  <br />
+  svg.append("g")<br />
+      .attr("class", "axis3")<br />
+      .attr("transform", "translate(0," + height + ")")<br />
+      .call(xAxis)<br />
+      .selectAll("text")<br />
+      .attr("y", -200)<br />
+      .attr("x", 45)<br />
+      .attr("dy", "1.1em")<br />
+      .style("text-anchor", "start")<br />
+      .style("font-size", 13);<br />
+<br />
+<br />
+  svg.append("rect")<br />
+    .attr("x", -1)<br />
+    .attr("y",355)<br />
+    .attr("height", 75)<br />
+    .attr("width", 970)<br />
+      .style("fill","white")<br />
+<br />
+<br />
+svg.selectAll("rect")<br />
+      .data(data)<br />
+    .enter().append("rect")<br />
+      .attr("class", "rect")<br />
+      .attr("x", function(d) { return d.xposition2})<br />
+      .attr("y", function(d) { return d.yposition2; })<br />
+      .attr("width", function(d) { return d.svgwidth2; })<br />
+      .attr("height", function(d) { return d.svgheight2; })<br />
+      .style("fill", function(d) { return d.color_code2; })<br />
+      .style("opacity",.2)<br />
+<br />
+  svg.selectAll("rect2")<br />
+      .data(data)<br />
+    .enter().append("rect")<br />
+      .attr("class", "rect")<br />
+      .attr("x", function(d) { return d.xposition})<br />
+      .attr("y", function(d) { return d.yposition; })<br />
+      .attr("width", function(d) { return d.svgwidth; })<br />
+      .attr("height", function(d) { return d.svgheight; })<br />
+      .style("fill", function(d) { return d.color_code; })<br />
+      .on("mouseover", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(200)<br />
+               .style("opacity", .9);<br />
+                  tooltip.html(d.year +": " + "&lt;br&gt;" + d.descrip + "&lt;br&gt;" + d.descrip2 + "&lt;br&gt;" + d.descrip3)<br />
+               .style("left", (d3.event.pageX - 65) + "px")<br />
+               .style("top", (d3.event.pageY - 80) + "px")<br />
+               d3.select(this).style("fill", "#C0C0C0");<br />
+      })<br />
+      .on("mouseout", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(500)<br />
+               .style("opacity", 0),<br />
+               d3.select(this).style("fill", function(d) { return d.color_code; });<br />
+<br />
+      });<br />
+<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","h1")<br />
+      .attr("dx", 5)<br />
+        .attr("dy", 30)<br />
+        .text(function(d) { return "BRANDEIS"})<br />
+        .style("fill","#B19330");<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","h1")<br />
+      .attr("dx", 50)<br />
+        .attr("dy", 330)<br />
+        .text(function(d) { return "SSFL"})<br />
+        .style("fill","#A23623");<br />
+<br />
+    svg.append("rect")<br />
+    .attr("x", 919)<br />
+    .attr("y",0)<br />
+    .attr("height", 600)<br />
+    .attr("width", 10)<br />
+      .style("fill","white")<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","axis") <br />
+      .attr("dx", 895)<br />
+        .attr("dy", 195)<br />
+        .text(function(d) { return "2015"})<br />
+          .style("font-size", 13);;<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","axis") <br />
+      .attr("dx", 895)<br />
+        .attr("dy", 195)<br />
+        .text(function(d) { return "2015"})<br />
+          .style("font-size", 13);;<br />
+<br />
+  svg.append("rect")<br />
+    .attr("x", 102)<br />
+    .attr("y",10)<br />
+    .attr("height", 130)<br />
+    .attr("width",10)<br />
+      .style("fill","#EEC535")<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","p") <br />
+      .attr("dx", 117)<br />
+        .attr("dy", 30.2)<br />
+        .text(function(d) { return "1950-Present:"})<br />
+        .style("fill","#B19330");<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","p") <br />
+      .attr("dx", 117)<br />
+        .attr("dy", 53.2)<br />
+        .text(function(d) { return "Camp Alonim Summer Camp  is open and"})<br />
+        .style("fill","#B19330");<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","p") <br />
+      .attr("dx", 117)<br />
+        .attr("dy", 70)<br />
+        .text(function(d) { return "Brandeis hosts adult weekend retreats,  "})<br />
+        .style("fill","#B19330");<br />
+<br />
+    svg.append("text")<br />
+    .attr("class","p") <br />
+      .attr("dx", 117)<br />
+        .attr("dy", 86.8)<br />
+        .text(function(d) { return "college institues and other events"})<br />
+        .style("fill","#B19330");<br />
+<br />
+  svg.append("rect")<br />
+    .attr("x", 102)<br />
+    .attr("y",215)<br />
+    .attr("height", 130)<br />
+    .attr("width",10)<br />
+      .style("fill","#A23623")<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","p") <br />
+      .attr("dx", 117)<br />
+        .attr("dy", 305)<br />
+        .text(function(d) { return "1953-2006: "})<br />
+        .style("fill","#A23623");<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","p") <br />
+      .attr("dx", 117)<br />
+        .attr("dy", 321.8)<br />
+        .text(function(d) { return "Thousands of rocket tests "})<br />
+        .style("fill","#A23623");<br />
+<br />
+    svg.append("text")<br />
+    .attr("class","p") <br />
+      .attr("dx", 117)<br />
+        .attr("dy", 338.6)<br />
+        .text(function(d) { return "are performed at SSFL"})<br />
+        .style("fill","#A23623");<br />
+<br />
+  svg.append("text")<br />
+    .attr("class","ant") <br />
+      .attr("dx", 5)<br />
+        .attr("dy", 400)<br />
+        .text(function(d) { return "*Hover over each bar for more info"})<br />
+          .style("font-size", 13);;<br />
+<br />
+<br />
+});<br />
+    &lt;/script&gt;<br />
+&lt;/div&gt;<br />
+  &lt;/body&gt;<br />
+<br />
+&lt;/html&gt;

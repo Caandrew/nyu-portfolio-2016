@@ -1,0 +1,365 @@
+&lt;!DOCTYPE html&gt;<br />
+&lt;html&gt;<br />
+  &lt;head&gt;<br />
+    &lt;link rel="stylesheet" type="text/css" href="style.css"&gt;<br />
+    &lt;link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"&gt;<br />
+    &lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"&gt;&lt;/script&gt;<br />
+    &lt;script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"&gt;&lt;/script&gt;<br />
+  &lt;/head&gt;<br />
+    &lt;script src="http://d3js.org/d3.v3.min.js"&gt;&lt;/script&gt;<br />
+  &lt;/head&gt;<br />
+   &lt;div class = "wrap"&gt;<br />
+  &lt;div class= "main"&gt;      &lt;div class="buttons"&gt;<br />
+  &lt;ul class="pagination"&gt;<br />
+      &lt;li class = "active"&gt;&lt;a href="files/galatolo.html"&gt;Galatolo&lt;/a&gt;&lt;/li&gt;<br />
+      &lt;li &gt;&lt;a href="files/blackwood.html"&gt;Blackwood&lt;/a&gt;&lt;/li&gt;<br />
+      &lt;li &gt;&lt;a href="files/keller.html"&gt;Keller&lt;/a&gt;&lt;/li&gt;<br />
+      &lt;li &gt;&lt;a href="files/claire.html"&gt;Claire&lt;/a&gt;&lt;/li&gt;<br />
+      &lt;li &gt;&lt;a href="files/stroud.html"&gt;Stroud&lt;/a&gt;&lt;/li&gt;<br />
+    &lt;/div&gt;&lt;/div&gt;<br />
+    &lt;div class="credits"&gt;Credits: Cynthia Andrews / NBC&lt;/br&gt;Source: San Mateo Community College District&lt;/div&gt;    <br />
+  &lt;/div&gt;<br />
+&lt;script&gt;<br />
+<br />
+var margin = {top: 20, right: 40, bottom: 90, left: 40},<br />
+    width = 970 - margin.left - margin.right,<br />
+    height = 500 - margin.top - margin.bottom;<br />
+<br />
+var x = d3.scale.ordinal()<br />
+    .rangeRoundBands([0, width], .1);<br />
+<br />
+var y = d3.scale.linear()<br />
+    .rangeRound([height, 0]);<br />
+<br />
+var color = d3.scale.ordinal()<br />
+    .range(["4A5E40", "ACCD9D","ACCD9D","DBDBDA"]);<br />
+<br />
+var xAxis = d3.svg.axis()<br />
+    .scale(x)<br />
+    .orient("bottom");<br />
+<br />
+var yAxis = d3.svg.axis()<br />
+    .scale(y)<br />
+    .orient("left")<br />
+    .tickFormat(d3.format(".2s"));<br />
+<br />
+var tooltip = d3.select(".main").append("div")<br />
+    .attr("class", "tooltip")<br />
+    .style("opacity", 0);<br />
+<br />
+var svg = d3.select(".main").append("svg")<br />
+    .attr("width", width + margin.left + margin.right)<br />
+    .attr("height", height + margin.top + margin.bottom)<br />
+  .append("g")<br />
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");<br />
+    <br />
+<br />
+<br />
+d3.tsv("data.tsv", function(error, data) {<br />
+  if (error) throw error;<br />
+<br />
+<br />
+<br />
+  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Dates"; }));<br />
+<br />
+  data.forEach(function(d) {<br />
+<br />
+    var descrip = d.descrip;<br />
+    var descrip2 = d.descrip2;  <br />
+    var descrip3 = d.descrip3;<br />
+    var descrip4 = d.descrip4;<br />
+    var descrip5 = d.descrip5; <br />
+    var descrip6 = d.descrip6; <br />
+    var sum = d.sum;<br />
+    var alcohol = d.alcohol;<br />
+    var descrip6 = d.descrip6;<br />
+    var y0 = 0;<br />
+    d.spending = color.domain().map(function(name) { return {descrip: descrip, descrip2: descrip2, descrip3: descrip3, descrip4: descrip4, descrip5: descrip5, alcohol:alcohol, sum: sum, descrip6:descrip6, name: name, y0: y0, y1: y0 += +d[name]}; });<br />
+    d.total = d.spending[d.spending.length - 1].y1;<br />
+  });<br />
+<br />
+<br />
+  x.domain(data.map(function(d) { return d.Dates; }));<br />
+  y.domain([0, 1200]);<br />
+<br />
+<br />
+<br />
+  svg.append("g")<br />
+      .attr("class", "y axis")<br />
+      .call(yAxis)<br />
+    .append("text")<br />
+      .attr("transform", "rotate(-90)")<br />
+      .attr("y", 6)<br />
+      .attr("dy", ".71em")<br />
+//Galatolo<br />
+    svg.append("line")<br />
+        .style("stroke-dasharray", 4,4)     <br />
+        .style("stroke", "#0000CD")<br />
+        .attr('opacity', .7)<br />
+        .attr("x1", 10)<br />
+        .attr("y1", 312)<br />
+        .attr("x2", 891)<br />
+        .attr("y2", 312)<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", width - 0)<br />
+      .attr("y", 312)<br />
+      .attr("dy", ".35em")<br />
+      .attr("class","foot")<br />
+      .style("text-anchor", "start")<br />
+        .style("fill", "#0000CD")       <br />
+      .text(function(d) { return "Galatolo"; });<br />
+<br />
+//Keller<br />
+    svg.append("line")<br />
+        .style("stroke-dasharray", 4,4)     <br />
+        .style("stroke", "grey") <br />
+        .attr('opacity', .7)<br />
+        .attr("x1", 10)<br />
+        .attr("y1", 370)<br />
+        .attr("x2", 891)<br />
+        .attr("y2", 370)<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", width - 0)<br />
+      .attr("y", 370)<br />
+      .attr("dy", ".35em")<br />
+      .attr("class","foot")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "Keller"; });<br />
+<br />
+//Blackwood<br />
+    svg.append("line")<br />
+        .style("stroke-dasharray", 4,4)     <br />
+        .style("stroke", "grey") <br />
+        .attr('opacity', .7)        <br />
+        .attr("x1", 10)<br />
+        .attr("y1", 341)<br />
+        .attr("x2", 891)<br />
+        .attr("y2", 341)<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", width - 0)<br />
+      .attr("y", 345)<br />
+      .attr("dy", ".35em")<br />
+      .attr("class","foot")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "Black-"; });<br />
+<br />
+ svg.append("text")<br />
+      .attr("x", width - 0)<br />
+      .attr("y", 353)<br />
+      .attr("dy", ".35em")<br />
+      .attr("class","foot")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "wood"; });<br />
+//Claire<br />
+    svg.append("line")<br />
+        .style("stroke-dasharray", 4,4) <br />
+        .style("stroke", "grey")<br />
+        .attr('opacity', .7)        <br />
+        .attr("x1", 10)<br />
+        .attr("y1", 335)<br />
+        .attr("x2", 891)<br />
+        .attr("y2", 335)<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", width - 0)<br />
+      .attr("y", 332)<br />
+      .attr("dy", ".35em")<br />
+      .attr("class","foot")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "Claire"; });<br />
+//Stroud<br />
+    svg.append("line")<br />
+        .style("stroke-dasharray", 4,4)     <br />
+        .style("stroke", "grey") <br />
+        .attr('opacity', .7)        <br />
+        .attr("x1", 10)<br />
+        .attr("y1", 168)<br />
+        .attr("x2", 891)<br />
+        .attr("y2", 168)<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", width - 0)<br />
+      .attr("y", 168)<br />
+      .attr("dy", ".35em")<br />
+      .attr("class","foot")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "Stroud"; });<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", width - 850)<br />
+      .attr("y", 160)<br />
+      .attr("dy", ".35em")<br />
+      .attr("class","foot")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "Avg. Spending, Media &amp; Entertainment"; }); <br />
+<br />
+<br />
+  var Dates = svg.selectAll(".Dates")<br />
+      .data(data)<br />
+    .enter().append("g")<br />
+      .attr("class", "g")<br />
+      .attr("transform", function(d) { return "translate(" + x(d.Dates) + ",0)"; });<br />
+<br />
+<br />
+  Dates.selectAll(".rect")<br />
+      .data(function(d) { return d.spending; })<br />
+    .enter().append("rect")<br />
+      .attr("width", x.rangeBand())<br />
+      .attr("y", function(d) { return y(d.y1); })<br />
+      .attr("height", function(d) { return y(d.y0) - y(d.y1); })<br />
+      .style("fill", function(d) { return color(d.name)})<br />
+      .on("mouseover", function(d) {                <br />
+          tooltip.transition()<br />
+               .duration(200)<br />
+               .attr("width", 50)<br />
+               .style("opacity", .9)<br />
+               .style("cursor", "pointer");<br />
+               tooltip.html(d.descrip + ":"+"&lt;/br&gt;" + "&lt;/br&gt;" + d.descrip2+ "&lt;/br&gt;" + "&lt;/br&gt;" + d.descrip3+ "&lt;/br&gt;" + "&lt;/br&gt;" + d.descrip4+ "&lt;/br&gt;" + "&lt;/br&gt;" + d.descrip5+ "&lt;/br&gt;" + "&lt;/br&gt;"  + "&lt;font color=red&gt;" + "&lt;strong&gt;" + d.descrip6+ "&lt;/strong&gt;"+"&lt;/font&gt;"+ "&lt;/br&gt;"+ "&lt;/br&gt;"+ "&lt;strong&gt;Total Expensed: &lt;/strong&gt;"+ "$" + d.sum)<br />
+               .style("left", (d3.event.pageX - 120) + "px")<br />
+               .style("top", (d3.event.pageY - 170) + "px")<br />
+<br />
+               d3.select(this).style("fill", "#B19330")<br />
+<br />
+      })<br />
+      .on("mouseout", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(500)<br />
+               .style("opacity", 0),<br />
+               d3.select(this).style("fill", function(d) { return color(d.name)})<br />
+<br />
+      });<br />
+<br />
+<br />
+<br />
+    svg.append("rect")<br />
+      .attr("x", width - 875)<br />
+      .attr("y", 0)<br />
+      .attr("width", 18)<br />
+      .attr("height", 18)<br />
+      .style("fill", "4A5E40");<br />
+<br />
+  svg.append("rect")<br />
+      .attr("x", width - 875)<br />
+      .attr("y", 25)<br />
+      .attr("width", 18)<br />
+      .attr("height", 18)<br />
+      .style("fill", "ACCD9D");<br />
+<br />
+  svg.append("rect")<br />
+      .attr("x", width - 875)<br />
+      .attr("y", 50)      <br />
+      .attr("width", 18)<br />
+      .attr("height", 18)<br />
+      .style("fill", "DBDBDA");<br />
+         <br />
+  svg.append("text")<br />
+      .attr("x", width - 845)<br />
+      .attr("y", 9)<br />
+      .attr("dy", ".35em")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "Meals &amp; Entertainment"; });<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", width - 845)<br />
+      .attr("y", 34)<br />
+      .attr("dy", ".35em")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "Hotels &amp; Travel"; });<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", width - 845)<br />
+      .attr("y", 59)<br />
+      .attr("dy", ".35em")<br />
+      .style("text-anchor", "start")<br />
+      .text(function(d) { return "Misc."; });      <br />
+<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 10)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 10)<br />
+        .attr("y2", 395)<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 10)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 307)<br />
+        .attr("y2", 400)<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 307)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 307)<br />
+        .attr("y2", 395)<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", 150)<br />
+      .attr("y", 415)<br />
+      .attr("class", "p")<br />
+      .text("2012")<br />
+<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 310)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 310)<br />
+        .attr("y2", 395)<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 310)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 582)<br />
+        .attr("y2", 400)<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 582)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 582)<br />
+        .attr("y2", 395)<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", 450)<br />
+      .attr("y", 415)<br />
+      .attr("class", "p")<br />
+      .text("2013")<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 585)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 585)<br />
+        .attr("y2", 395)<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 585)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 891)<br />
+        .attr("y2", 400)<br />
+<br />
+    svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 891)<br />
+        .attr("y1", 400)<br />
+        .attr("x2", 891)<br />
+        .attr("y2", 395)<br />
+<br />
+  svg.append("text")<br />
+      .attr("x", 720)<br />
+      .attr("y", 415)<br />
+      .attr("class", "p")<br />
+      .text("2014")<br />
+<br />
+     <br />
+});<br />
+<br />
+&lt;/script&gt;<br />
