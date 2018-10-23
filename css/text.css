@@ -1,0 +1,27 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-size: 24px;
+  font-family: Franklin Gothic;
+}
+
+.header {
+  text-align: center;
+  padding: 32px;
+}
+
+.container {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+.title {
+  position: absolute;
+  background-color: black;
+  opacity: .5;
+  width: 100%;
+  top: 65%;
+}
