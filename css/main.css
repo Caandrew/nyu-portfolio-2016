@@ -17,16 +17,20 @@ body {
   position: relative;
   text-align: center;
   color: #333;
+  border-style: solid;
+  border-color: #333;   
 }
 .title {
+  font-size: 18px;
   position: absolute;
   color: #333;
   background-color: white;
-  border-style: solid;
+  border-top: solid;
+  border-bottom: solid;  
   border-color: #333;  
-  padding: 14px 16px;
+  padding: 10px 10px;
   width: 100%;
-  top: 70%;
+  top: 50%;
 }
 
 .row {
