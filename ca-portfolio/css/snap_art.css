@@ -1,0 +1,46 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Franklin Gothic;
+}
+
+.header {
+  text-align: center;
+  padding: 32px;
+}
+
+.container {
+  padding: 32px;
+}
+
+.title {
+  position: absolute;
+  background-color: black;
+  opacity: .5;
+  width: 100%;
+  top: 65%;
+}
+
+.row {
+  display: -ms-flexbox; /* IE10 */
+  display: flex;
+  -ms-flex-wrap: wrap; /* IE10 */
+  flex-wrap: wrap;
+  padding: 0 4px;    
+}
+
+/* Create four equal columns that sits next to each other */
+.column {
+  -ms-flex: 20%; /* IE10 */
+  flex: 20%;
+  max-width: 20%;
+  padding: 0 4px;
+}
+
+.column img {
+  margin-top: 8px;
+  vertical-align: middle;
+}

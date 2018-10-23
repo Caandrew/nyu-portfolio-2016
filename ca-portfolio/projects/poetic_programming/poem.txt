@@ -1,0 +1,16 @@
+Feelings of angst permeate through (8s, 5w)
+consuming me (4s, 2w)
+
+My heart beats in concert with racing thoughts (10s, 8w)
+about you and me; us (6s, 5w)
+
+Gasping for air (4s, 3w)
+holding my breath (4s, 3w)
+My only hope is that you won't walk away when (12s, 10w)
+I do what we have always done (8s, 7w)
+
+var syllableCount = 56
+var syllable = [8,4,10,6,4,4,12,8]
+var wordCount = 43
+var words = [5,2,8,5,3,3,10,7]
+var lines = ["Feelings of angst permeate through", "consuming me", "My heart beats in concert with racing thoughts", "about you and me; us", "Gasping for air", "holding my breath", "My only hope is that you won't walk away when", "I do what we have always done"]
