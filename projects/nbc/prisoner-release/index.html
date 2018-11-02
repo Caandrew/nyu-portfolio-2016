@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="title"><h1>Reduced Federal Drug Sentences</h1>Of 17,446 applications for reduced sentences, 13,187 were granted. In this graphic, we explore how many sentences were reduced by the state where the prisoner was convicted. We also break down those convictions by drug type and the inmate's race, citizenship status and gender.</br></div>
+  <div class="map"><div id="tooltip-container"; style = "display:none"></div></div>
+  
+  <div class="drugs"><h1>Convictions by Drug Type</h1></div>
+  <div class="race"><h1>Convictions by Race</h1></div>
+  <div class="citi"><h1>Convictions by Citizenship Status</h1></div>
+  <div class="bar"><h1>Convictions by Gender</h1></div>
+  <div class="credits">Sources: United States Sententencing Commission </br>Credit: Cynthia Andrews/NBC</div> 
+</div>
+</body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<script>
+
+d3.csv("data3.csv", function(err, data) {
+  var config = {"color1":"#A8D4EE","color2":"#28566F","statecolumn":"state","valuecolumn":"number_granted"}
+  
+  var WIDTH4 = 650;
+
+  var HEIGHT4 = 400;
+  
+  var COLOR_COUNTS = 20;
+  
+  var SCALE = 0.7;
+  
+  function Interpolate(start, end, steps, count) {
+      var s = start,
+          e = end,
+          final = s + (((e - s) / steps) * count);
+      return Math.floor(final);
+  }
+  
+  function Color(_r, _g, _b) {
+      var r, g, b;
+      var setColors = function(_r, _g, _b) {
+          r = _r;
+          g = _g;
+          b = _b;
+      };
+  
+      setColors(_r, _g, _b);
+      this.getColors = function() {
+          var colors = {
+              r: r,
+              g: g,
+              b: b
+          };
+          return colors;
+      };
+  }
+  
+  function hexToRgb(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+      } : null;
+  }
+  
+  function valueFormat(d) {
+    if (d > 1000000000) {
+      return Math.round(d / 1000000000 * 10) / 10 + "B";
+    } else if (d > 1000000) {
+      return Math.round(d / 1000000 * 10) / 10 + "M";
+    } else if (d > 1000) {
+      return Math.round(d / 1000 * 10) / 10 + "K";
+    } else {
+      return d;
+    }
+  }
+  
+  var COLOR_FIRST = config.color1, COLOR_LAST = config.color2;
+  
+  var rgb = hexToRgb(COLOR_FIRST);
+  
+  var COLOR_START = new Color(rgb.r, rgb.g, rgb.b);
+  
+  rgb = hexToRgb(COLOR_LAST);
+  var COLOR_END = new Color(rgb.r, rgb.g, rgb.b);
+  
+  var MAP_STATE = config.statecolumn;
+  var MAP_VALUE = config.valuecolumn;
+  
+  var width5 = WIDTH4,
+      height5 = HEIGHT4;
+  
+  var valueById = d3.map();
+  
+  var startColors = COLOR_START.getColors(),
+      endColors = COLOR_END.getColors();
+  
+  var colors3 = [];
+  
+  for (var i = 0; i < COLOR_COUNTS; i++) {
+    var r = Interpolate(startColors.r, endColors.r, COLOR_COUNTS, i);
+    var g = Interpolate(startColors.g, endColors.g, COLOR_COUNTS, i);
+    var b = Interpolate(startColors.b, endColors.b, COLOR_COUNTS, i);
+    colors3.push(new Color(r, g, b));
+  }
+  
+  var quantize = d3.scale.quantize()
+      .domain([0, 1.0])
+      .range(d3.range(COLOR_COUNTS).map(function(i) { return i }));
+  
+  var path4 = d3.geo.path();
+  
+  var svg5 = d3.select(".map").append("svg")
+      .attr("width", width5)
+      .attr("height", height5);
+  
+  d3.csv("states.csv", function(error, names) {
+  
+  name_id_map = {};
+  id_name_map = {};
+  
+  for (var i = 0; i < names.length; i++) {
+    name_id_map[names[i].name] = names[i].id;
+    id_name_map[names[i].id] = names[i].name;
+  }
+  
+  data.forEach(function(d) {
+    var id = name_id_map[d[MAP_STATE]];
+    valueById.set(id, +d[MAP_VALUE]); 
+  });
+  
+  quantize.domain([d3.min(data, function(d){ return +d[MAP_VALUE] }),
+    d3.max(data, function(d){ return +d[MAP_VALUE] })]);
+  
+  d3.json("https://s3-us-west-2.amazonaws.com/vida-public/geo/us.json", function(error, us) {
+    svg5.append("g")
+        .attr("class", "states-choropleth")
+      .selectAll("path")
+        .data(topojson.feature(us, us.objects.states).features)
+      .enter().append("path")
+        .attr("transform", "scale(" + SCALE + ")")
+        .style("fill", function(d) {
+          if (valueById.get(d.id)) {
+            var i = quantize(valueById.get(d.id));
+            var color3 = colors3[i].getColors();
+            return "rgb(" + color3.r + "," + color3.g +
+                "," + color3.b + ")";
+          } else {
+            return "";
+          }
+        })
+        .attr("d", path4)
+        .on("mousemove", function(d) {
+            var html = "";
+  
+            html += "<div class=\"tooltip_kv\">";
+            html += "<span class=\"tooltip_key\">";
+            html += id_name_map[d.id] + ":";
+            html += "</span>";
+            html += "<span class=\"tooltip_value\">";
+            html += (valueById.get(d.id) ? valueFormat(valueById.get(d.id)) : "");
+            html += "";
+            html += "</span>";
+            html += "</div>";
+            
+            $("#tooltip-container").html(html);
+            $(this).attr("fill-opacity", "0.8");
+            $("#tooltip-container").show();
+            
+            var coordinates = d3.mouse(this);
+            
+            var map_width = $('.states-choropleth')[0].getBoundingClientRect().width;
+            
+            if (d3.event.layerX < map_width / 2) {
+              d3.select("#tooltip-container")
+                .style("top", (d3.event.layerY + 15) + "px")
+                .style("left", (d3.event.layerX + 15) + "px");
+            } else {
+              var tooltip_width = $("#tooltip-container").width();
+              d3.select("#tooltip-container")
+                .style("top", (d3.event.layerY + 15) + "px")
+                .style("left", (d3.event.layerX - tooltip_width - 30) + "px");
+            }
+        })
+        .on("mouseout", function() {
+                $(this).attr("fill-opacity", "1.0");
+                $("#tooltip-container").hide();
+            });
+  
+      svg5.append("path4")
+        .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+        .attr("class", "states")
+        .attr("transform", "scale(" + SCALE + ")")
+        .attr("d", path4);
+    svg5.append("path")
+        .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+        .attr("class", "states")
+        .attr("transform", "scale(" + SCALE + ")")
+        .attr("d", path4);
+    
+    svg5.append("text")
+        .attr("dx", 50)
+        .attr("dy", 375)
+        .attr("class", "label")
+        .text(function(d) {return "** Mouseover or tap a state to see the number of sentences reduced."});
+
+    svg5.append("text")
+      .attr("dx", 290)
+      .attr("dy", 270)
+      .attr("class", "label")
+      .attr("fill", "white")
+      .text(function(d) {return "2,105"});
+
+    svg5.append("text")
+      .attr("dx", 85)
+      .attr("dy", 170)
+      .attr("class", "label")
+      .attr("fill", "white")
+      .text(function(d) {return "571"});
+
+    svg5.append("text")
+      .attr("dx", 500)
+      .attr("dy", 315)
+      .attr("class", "label")
+      .attr("fill", "white")      
+      .text(function(d) {return "863"});
+
+    svg5.append("text")
+      .attr("dx", 350)
+      .attr("dy", 137)
+      .attr("class", "label")
+      .attr("fill", "white")
+      .text(function(d) {return "730"});
+
+    svg5.append("text")
+      .attr("dx", 508)
+      .attr("dy", 180)
+      .attr("class", "label")
+      .attr("fill", "white")
+      .text(function(d) {return "692"});
+
+    svg5.append("text")
+      .attr("dx", 395)
+      .attr("dy", 160)
+      .attr("class", "label")
+      .attr("fill", "white")
+      .text(function(d) {return "660"});
+d3.selectAll("text").style("cursor", "default")
+  });
+  
+  });
+});
+
+
+</script>
+
+<script>
+	
+var width = 275,
+    height = 300,
+    radius = Math.min(width, height) / 2,
+    innerRadius = 0.1 * radius;
+
+var pie = d3.layout.pie()
+    .sort(null)
+    .value(function(d) { return d.width; });
+
+var arc = d3.svg.arc()
+  .innerRadius(innerRadius)
+  .outerRadius(function (d) { 
+    return (radius - innerRadius) * (d.data.percentage / 31.0) + innerRadius; 
+  });
+
+var svg = d3.select(".drugs").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+d3.csv('data.csv', function(error, data) {
+
+  data.forEach(function(d) {
+    d.color  =  d.color;
+    d.width  = +d.percentage;
+  });
+
+
+var path = svg.selectAll(".solidArc")
+      .data(pie(data))
+    .enter().append("path")
+      .attr("fill", function(d) { return d.data.color; })
+      .attr("class", "solidArc")
+      .attr("stroke", "white")
+      .attr("d", arc)
+
+svg.append("text")
+  .attr("dx", -20)
+  .attr("dy", 90)
+  .attr("class", "label")
+  .attr("fill", "#F8F8FF")
+  .text(function(d) {return "27.2%"})
+  ;;
+
+svg.append("text")
+  .attr("dx", -28)
+  .attr("dy", 75)
+  .attr("class", "label")
+  .attr("fill", "#F8F8FF")
+  .text(function(d) {return "Cocaine"})
+  ;;
+
+svg.append("text")
+  .attr("dx", -90)
+  .attr("dy", -20)
+  .attr("class", "label")
+  .attr("fill", "white")
+  .text(function(d) { return "30.9%"})
+  ;
+
+svg.append("text")
+  .attr("dx", -90)
+  .attr("dy", -35)
+  .attr("class", "label")
+  .attr("fill", "white")
+  .text(function(d) { return "Meth"})
+  ;
+
+svg.append("text")
+  .attr("dx", 40)
+  .attr("dy", 25)
+  .attr("class", "label")
+  .attr("fill", "white")
+  .text(function(d) {return "20.5%"})
+  ;
+
+svg.append("text")
+  .attr("dx", 14.5)
+  .attr("dy", 10)
+  .attr("class", "labelS")
+  .attr("fill", "white")
+  .text(function(d) {return " Crack Cocaine"})
+  ;;
+
+svg.append("line")
+  .style("stroke", "grey")
+  .attr("x1", -6)
+  .attr("y1", -120)
+  .attr("x2", -6)
+  .attr("y2", -40)
+
+svg.append("line")
+  .style("stroke", "grey")
+  .attr("x1", -6)
+  .attr("y1", -120)
+  .attr("x2", 38)
+  .attr("y2", -120);
+
+svg.append("text")
+  .attr("dx", 41)
+  .attr("dy", -115)
+  .attr("class", "label")
+  .text(function(d) {return "4.7%"})
+  ;;
+
+
+svg.append("line")
+  .style("stroke", "grey")
+  .attr("x1",10)
+  .attr("y1", -90)
+  .attr("x2", 10)
+  .attr("y2", -55);
+
+svg.append("line")
+  .style("stroke", "grey")
+  .attr("x1", 10)
+  .attr("y1", -90)
+  .attr("x2", 38)
+  .attr("y2", -90);
+
+svg.append("text")
+  .attr("dx", 41)
+  .attr("dy", -90)
+  .attr("class", "label")
+  .text(function(d) {return "9.1%"})
+  ;;
+
+svg.append("line")
+  .style("stroke", "grey")
+  .attr("x1",35)
+  .attr("y1", -60)
+  .attr("x2", 35)
+  .attr("y2", -35);
+
+svg.append("line")
+  .style("stroke", "grey")
+  .attr("x1", 35)
+  .attr("y1", -60)
+  .attr("x2", 38)
+  .attr("y2", -60)
+
+svg.append("text")
+  .attr("dx", 41)
+  .attr("dy", -60)
+  .attr("class", "label")
+  .text(function(d) {return "7.6%"})
+  ;;
+
+svg.append("text")
+  .attr("dx", 77)
+  .attr("dy", -115)
+  .attr("class", "label")
+  .text(function(d) {return "Other"})
+  ;;
+svg.append("text")
+  .attr("dx", 77)
+  .attr("dy", -90)
+  .attr("class", "label")
+  .text(function(d) {return "Marijuana"})
+  ;;
+svg.append("text")
+  .attr("dx", 77)
+  .attr("dy", -60)
+  .attr("class", "label")
+  .text(function(d) {return "Heroin"})
+  ;;
+d3.selectAll("text").style("cursor", "default")
+});
+
+</script>
+<script>
+var width2 = 275,
+    height2 = 300,
+    radius2 = Math.min(width2, height2) / 2,
+    innerRadius2 = 0.1 * radius2;
+
+var pie2 = d3.layout.pie()
+    .sort(null)
+    .value(function(d) { return d.width; });
+
+var arc2 = d3.svg.arc()
+  .innerRadius(innerRadius2)
+  .outerRadius(function (d) { 
+    return (radius2 - innerRadius2) * (d.data.racepercent / 40.0) + innerRadius2; 
+  });
+
+var svg2 = d3.select(".race").append("svg")
+    .attr("width", width2)
+    .attr("height", height2)
+    .append("g")
+    .attr("transform", "translate(" + width2 / 2 + "," + height2 / 2 + ")");
+
+d3.csv('data.csv', function(error, data) {
+
+  data.forEach(function(d) {
+    d.color  =  d.racecolor;
+    d.width  = +d.racepercent;
+  });
+  
+var path2 = svg2.selectAll(".solidArc")
+      .data(pie2(data))
+    .enter().append("path")
+      .attr("fill", function(d) { return d.data.color; })
+      .attr("class", "solidArc")
+      .attr("stroke", "white")
+      .attr("d", arc2)
+
+svg2.append("text")
+  .attr("dx", 10)
+  .attr("dy", 70)
+  .attr("class", "label")
+  .attr("fill", "#F8F8FF")
+  .text(function(d) {return "34.4%"})
+  ;;
+
+svg2.append("text")
+  .attr("dx", -90)
+  .attr("dy", -10)
+  .attr("class", "label")
+  .attr("fill", "white")
+  .text(function(d) { return "38.4%"})
+  ;  
+
+svg2.append("text")
+  .attr("dx", 20)
+  .attr("dy", -30)
+  .attr("class", "label")
+  .attr("fill", "white")
+  .text(function(d) {return "24.2%"})
+  ;;
+
+svg2.append("line")
+  .style("stroke", "grey")
+  .attr("x1", -12)
+  .attr("y1", -120)
+  .attr("x2", -3)
+  .attr("y2", -30)
+
+svg2.append("line")
+  .style("stroke", "grey")
+  .attr("x1", -12)
+  .attr("y1", -120)
+  .attr("x2", 38)
+  .attr("y2", -120)
+
+svg2.append("text")
+  .attr("dx", 45)
+  .attr("dy", -115)
+  .attr("class", "label")
+  .text(function(d) {return "3%"})
+  ;;
+
+svg2.append("text")
+  .attr("dx", -25)
+  .attr("dy", 55)
+  .attr("class", "label")
+  .attr("fill", "#F8F8FF")
+  .text(function(d) {return "African American"})
+  ;;
+svg2.append("text")
+  .attr("dx", -95)
+  .attr("dy", -25)
+  .attr("class", "label")
+  .attr("fill", "white")
+  .text(function(d) { return "Hispanic"})
+  ;
+
+svg2.append("text")
+  .attr("dx", 3)
+  .attr("dy", -45)
+  .attr("class", "label")
+  .attr("fill", "white")
+  .text(function(d) {return "Caucasian"})
+  ;;
+svg2.append("text")
+  .attr("dx", 80)
+  .attr("dy", -115)
+  .attr("class", "label")
+  .text(function(d) {return "Other"})
+  ;;
+
+d3.selectAll("text").style("cursor", "default")
+});
+
+</script>
+<script>
+
+var width3 = 275,
+    height3 = 300,
+    radius3 = Math.min(width3, height3) / 2,
+    innerRadius3 = 0.1 * radius3;
+
+var pie3 = d3.layout.pie()
+    .sort(null)
+    .value(function(d) { return d.width; });
+
+var arc3 = d3.svg.arc()
+  .innerRadius(innerRadius3)
+  .outerRadius(function (d) { 
+    return (radius3 - innerRadius3) * (d.data.citpercent / 85.0) + innerRadius3; 
+  });
+
+var svg3 = d3.select(".citi").append("svg")
+    .attr("width", width3)
+    .attr("height", height3)
+    .append("g")
+    .attr("transform", "translate(" + width3 / 2 + "," + height3 / 2 + ")");
+
+d3.csv('data.csv', function(error, data) {
+
+  data.forEach(function(d) {
+    d.color  =  d.citcolor;
+    d.width  = +d.citpercent;
+  });
+  
+var path3 = svg3.selectAll(".solidArc")
+      .data(pie3(data))
+    .enter().append("path")
+      .attr("fill", function(d) { return d.data.color; })
+      .attr("class", "solidArc")
+      .attr("stroke", "white")
+      .attr("d", arc3)
+
+svg3.append("text")
+  .attr("dx", 10)
+  .attr("dy", 70)
+  .attr("class", "label")
+  .attr("fill", "#F8F8FF")
+  .text(function(d) {return "76.5%"})
+  ;
+
+svg3.append("text")
+  .attr("dx", -90)
+  .attr("dy", -60)
+  .attr("class", "label")
+  .text(function(d) {return "23.5%"})
+  	
+
+svg3.append("text")
+  .attr("dx", 5)
+  .attr("dy", 55)
+  .attr("class", "label")
+  .attr("fill", "#F8F8FF")
+  .text(function(d) {return "Citizens"})
+  ;
+
+svg3.append("text")
+  .attr("dx", -110)
+  .attr("dy", -75)
+  .attr("class", "label")
+  .text(function(d) {return "Non-Citizens"})
+  ;
+
+
+svg3.append("line")
+  .style("stroke", "grey")
+  .attr("x1", -40)
+  .attr("y1", -65)
+  .attr("x2", -30)
+  .attr("y2", -65)
+
+svg3.append("line")
+  .style("stroke", "grey")
+  .attr("x1", -30)
+  .attr("y1", -65)
+  .attr("x2", -30)
+  .attr("y2", -45)
+
+
+d3.selectAll("text").style("cursor", "default")
+});
+
+</script>
+<script>
+
+var margin = {top: 40, right: 40, bottom: 75, left: 45},
+    width4 = 300 - margin.left - margin.right,
+    height4 = 300 - margin.top - margin.bottom;
+
+var x0 = d3.scale.ordinal()
+    .rangeRoundBands([0, width4], .1);
+
+var x1 = d3.scale.ordinal();
+
+var y = d3.scale.linear()
+    .range([height4, 0]);
+
+var color = d3.scale.ordinal()
+    .range(["#28566F", "#E27660"]);
+
+var xAxis = d3.svg.axis()
+    .scale(x0)
+    .orient("bottom")
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(6)
+    .tickFormat(d3.format("%"))
+
+var svg4 = d3.select(".bar").append("svg")
+    .attr("width", width4 + margin.left + margin.right)
+    .attr("height", height4 + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.csv("data2.csv", function(error, data) {
+  if (error) throw error;
+
+  var drugNames = d3.keys(data[0]).filter(function(key) { return key !== "Drug"; });
+
+  data.forEach(function(d) {
+    d.drugs = drugNames.map(function(name) { return {name: name, value: +d[name]}; });
+  });
+
+  x0.domain(data.map(function(d) { return d.Drug; }));
+  x1.domain(drugNames).rangeRoundBands([0, x0.rangeBand()]);
+  y.domain([0, 1]);
+
+  svg4.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height4 + ")")
+      .call(xAxis)    
+    .selectAll("text")
+      .attr("y", 9)
+      .attr("x", 4)
+      .attr("dy", ".35em")
+      .attr("class", "p")
+      .attr("transform", "rotate(45)")
+      .style("text-anchor", "start")
+      ;;
+  
+  svg4.append("g")
+      .attr("class", "axis")
+      .call(yAxis)
+        ;
+
+  var Drug = svg4.selectAll(".Drug")
+      .data(data)
+    .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + x0(d.Drug) + ",0)"; });
+
+  Drug.selectAll("rect")
+      .data(function(d) { return d.drugs; })
+    .enter().append("rect")
+      .attr("width", x1.rangeBand())
+      .attr("x", function(d) { return x1(d.name); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height4 - y(d.value); })
+      .style("fill", function(d) { return color(d.name); });
+
+  var legend = svg4.selectAll(".legend")
+      .data(drugNames.slice().reverse())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
+      ;;
+
+  legend.append("rect")
+      .attr("x", width4 - 18)
+      .attr("y", -35)      
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  legend.append("text")
+      .attr("x", width4 - 24)
+      .attr("y", -25)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+
+d3.selectAll("text").style("cursor", "default")
+});
+
+</script>
+
+</body>
+</html>

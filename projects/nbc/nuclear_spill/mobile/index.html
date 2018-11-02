@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+     <link rel="stylesheet" href="style.css">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+  </head>
+  <body>
+    <div id="wrap">
+            <div class="spill"></div>
+    <script>
+ 
+var margin1 = {top: 100, right: 0, bottom: 50, left: 0},
+    width = 300 - margin1.left - margin1.right,
+    height = 1000 - margin1.top - margin1.bottom;
+
+var y = d3.scale.linear()
+    .domain([1950,2016])
+    .range([0, height]);
+
+var x = d3.scale.linear()
+    .domain([-1, 1])
+    .range([0, width]);
+
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickSize(-height)
+    .tickFormat(d3.format("d"))
+    .tickValues(d3.range(0,2,1 ));
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickValues(d3.range(1952, 2011, 11));
+
+var svg = d3.select(".spill").append("svg")
+    .attr("width", width + margin1.left + margin1.right)
+    .attr("height", height + margin1.top + margin1.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+
+d3.tsv("data.tsv", function(error, data) {
+  if (error) throw error;
+
+  data.forEach(function(d) {
+    d.set_domain = +d.set_domain;
+    d.year = +d.year;
+  });
+
+svg.append("circle")
+        .style("fill", "white") 
+        .style("stroke", "red") 
+        .style("stroke-dasharray", 4,4) 
+        .attr("cx", 150)
+        .attr("cy", 129.54545454545453)
+        .attr("r", 10);
+
+  svg.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("r", function(d) { return d.level*.1; })
+      .attr("cx", function(d) { return x(d.set_domain); })
+      .attr("cy", function(d) { return y(d.year); })
+      .style("fill", function(d) { return d.color_code; })
+ 
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 120)
+        .attr("y1", 29)
+        .attr("x2", 140)
+        .attr("y2", 29);
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 9)
+        .text(function(d) { return "The Chalk River"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 21)
+        .text(function(d) { return "Incident, a level"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 32)
+        .text(function(d) { return " 5 event occurred"});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 44)
+        .text(function(d) { return "on Sept. 29, 1952"});
+
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 222)
+        .attr("y1", 100)
+        .attr("x2", 222)
+        .attr("y2", 90);
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 175)
+        .attr("y1", 100)
+        .attr("x2", 222)
+        .attr("y2", 100)
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 50)
+        .text(function(d) { return "This level 5 event"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 62)
+        .text(function(d) { return " in Windscale Fire,"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 74)
+        .text(function(d) { return "UK occured on"});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 86)
+        .text(function(d) { return "Oct. 20"});
+
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 125)
+        .attr("y1", 100)
+        .attr("x2", 140)
+        .attr("y2", 100);
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 94)
+        .text(function(d) { return "This level 6 event"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 106)
+        .text(function(d) { return "in Kyshtym, Russia"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 118)
+        .text(function(d) { return "occured on Sept. 29,"});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 130)
+        .text(function(d) { return "1957"});
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 165)
+        .attr("y1", 129)
+        .attr("x2", 185)
+        .attr("y2", 129);
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 129)
+        .text(function(d) { return "The 1959 Santa "});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 141)
+        .text(function(d) { return " Susana Field"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 153)
+        .text(function(d) { return "Laboratory,"});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 165)
+        .text(function(d) { return " Sodium Reactor"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 177)
+        .text(function(d) { return " Experiment's"});
+  
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 189)
+        .text(function(d) { return "level is unknown"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 201)
+        .text(function(d) { return "but is said to"});
+
+svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 213)
+        .text(function(d) {return "have released "})
+
+svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 225)
+        .text(function(d) {return "260 times more"})
+
+svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 237)
+        .text(function(d) {return "radiation than"})
+
+svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 249)
+        .text(function(d) {return "The Three Mile"})
+
+svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx",190)
+        .attr("dy", 261)
+        .text(function(d) {return "Island Disaster"})
+
+
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 120)
+        .attr("y1", 159)
+        .attr("x2", 140)
+        .attr("y2", 159);
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 163)
+        .text(function(d) { return "The SL-1 Incident,"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 175)
+        .text(function(d) { return "a level 4 event"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 187)
+        .text(function(d) { return "occured on Jan. 3,"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 199)
+        .text(function(d) { return "1961"});
+
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 222)
+        .attr("y1", 418)
+        .attr("x2", 160)
+        .attr("y2", 418);
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 222)
+        .attr("y1", 418)
+        .attr("x2", 222)
+        .attr("y2", 413);
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 362)
+        .text(function(d) { return "The Three Mile"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 374)
+        .text(function(d) { return " Island Disaster, "});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 386)
+        .text(function(d) { return "a level 5 event "});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 398)
+        .text(function(d) { return "occurred on."});
+
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 410)
+        .text(function(d) { return "March 28, 1979."});
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 120)
+        .attr("y1", 431)
+        .attr("x2", 140)
+        .attr("y2", 431);
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 434)
+        .text(function(d) { return "The 1980 Yucca"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 446)
+        .text(function(d) { return " Flat Incident's level"});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 458)
+        .text(function(d) { return " is unknown"});
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 165)
+        .attr("y1", 475)
+        .attr("x2", 185)
+        .attr("y2", 475);
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 455)
+        .text(function(d) { return "The Buenos"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 467)
+        .text(function(d) { return " Aires Accident,  "});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 479)
+        .text(function(d) { return " a level 4 event"});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 491)
+        .text(function(d) { return "occurred on"});
+
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 503)
+        .text(function(d) { return "Sept. 23 1983."});
+  
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 120)
+        .attr("y1", 519)
+        .attr("x2", 140)
+        .attr("y2", 519);
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 504)
+        .text(function(d) { return "The Chernobyl"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 516)
+        .text(function(d) { return " Accident, a level 7 "});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 528)
+        .text(function(d) { return "event occurred on"});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 540)
+        .text(function(d) { return "April 26, 1986."});
+
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 165)
+        .attr("y1", 533)
+        .attr("x2", 185)
+        .attr("y2", 533);
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 541)
+        .text(function(d) { return "The Goiania"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 553)
+        .text(function(d) { return " Accident, a  "});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 565)
+        .text(function(d) { return "level 5 event "});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 577)
+        .text(function(d) { return "occurred on."});
+
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 589)
+        .text(function(d) { return "Sept. 13 1987."});
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 120)
+        .attr("y1", 706)
+        .attr("x2", 140)
+        .attr("y2", 706);
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 691)
+        .text(function(d) { return "The Tokaimura"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 704)
+        .text(function(d) { return " Accident, a level 4 "});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 716)
+        .text(function(d) { return "event occurred on"});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 10)
+        .attr("dy", 728)
+        .text(function(d) { return "Sept. 13 1999."});
+
+
+svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 165)
+        .attr("y1", 879)
+        .attr("x2", 185)
+        .attr("y2", 879);
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 853)
+        .text(function(d) { return "The Fukushima "});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 864)
+        .text(function(d) { return "Daiichi Accident, "});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 876)
+        .text(function(d) { return " a level 7 event "});
+
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 888)
+        .text(function(d) { return "occurred on"});
+
+  svg.append("text")
+        .attr("class", "psmall")
+        .attr("dx", 190)
+        .attr("dy", 900)
+        .text(function(d) { return "March 11 2011."});
+});
+    </script>

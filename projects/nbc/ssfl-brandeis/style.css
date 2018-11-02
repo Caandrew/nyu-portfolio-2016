@@ -1,0 +1,102 @@
+.wrap {
+    width: 960px;
+    height: 500;
+    margin: 0 auto;
+}
+
+.title{
+    width: 665px;
+    height: 100px;
+    float: top;
+    }
+
+.main{
+    width: 960px;
+    height: 500px;
+    float: left;
+    }
+
+body {
+  font: 14px sans-serif;
+}
+
+h1 { 
+  font-family: 'Roboto', sans-serif;
+  font-size: 25px;
+  font-weight: 300;
+  color: #333;
+  margin-bottom: 10px;
+  line-height: 1.2em;
+}
+
+.p {
+  font-family: 'Arimo', sans-serif;
+  font-size: 14px;
+  line-height: 1.3em;
+  color: #333;
+ 
+}
+
+.foot { font-size: 11px; color: lightgrey; font-style: italic;}
+.foot a { color: #80bee4; text-decoration: none; } 
+.spacer { margin-top: 40px; }
+
+.credits {
+  font-family: 'Arimo', sans-serif;
+  font-size: 12px;
+  color: #999;
+  margin-top: 10px;
+  float: right;
+}
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: lightgrey;
+  stroke-dasharray: 3,3;
+  shape-rendering: crispEdges;
+
+}
+
+.axis2 path,
+.axis2 line {
+  fill: none;
+  stroke: lightgrey;
+  shape-rendering: crispEdges;
+
+}
+
+.axis3 path,
+.axis3 line {
+  fill: none;
+  stroke: none;
+  shape-rendering: crispEdges;
+}
+
+.h1 { 
+  font-family: 'Roboto', sans-serif;
+  font-size: 17px;
+  font-weight: 300;
+  margin-bottom: 10px;
+  line-height: 1.2em;
+}
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  line-height: 1;
+  font-weight: normal;
+  font-size: 14px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  border-radius: 2px;
+  text-align: center;
+  float:left;
+}
+
+.ant { font-size: 11px; color: lightgrey; font-style: italic;}
