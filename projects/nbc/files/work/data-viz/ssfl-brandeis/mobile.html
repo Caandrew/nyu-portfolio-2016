@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style2.css">
+		<meta charset="utf-8">
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+	</head>
+	<div class=wrap>
+	<div class=main></div></div>
+	<script>
+
+	var margin = {top: 25, right: 25, bottom: 10, left: 25},
+    width = 309 - margin.left - margin.right,
+    height = 650 - margin.top - margin.bottom;
+
+	var x = d3.scale.linear()
+    .domain([300,0])
+    .range([0, width]);
+
+	var y = d3.scale.linear()
+    .domain([1947,2020])
+    .range([0,height]);
+
+	var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(" "))
+    .tickSize(-width)
+    .tickValues(d3.range(1947,2022, 10));
+
+	var yAxis2 = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(" "))
+    .tickSize(-width)
+    .tickValues(d3.range(1952,2022, 10));
+
+	var yAxis3 = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(" "))
+    .tickValues(d3.range(0,0,0));
+
+    var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickValues(0,42,1)
+
+
+    var svg = d3.select(".main").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("svg")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var tooltip = d3.select("main").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+
+	d3.tsv("data2.tsv", function(error, data) {
+  		if (error) throw error;
+
+	svg.append("svg")
+    	.attr("class", "axis2")
+    	.attr("transform", "translate(0," + width + ")")
+      .style("stroke", "white")
+    	.call(yAxis3)
+
+	svg.append("svg")
+    	.attr("class", "axis")
+    	.attr("transform", "translate(0," + width + ")")
+    	.call(yAxis)
+    	.selectAll("text")
+    	.attr("y", 28)
+    	.attr("x", 120)
+    	.attr("dy", "1.1em")
+    	.style("text-anchor", "start")
+    	.style("background-color", "white")
+    	.style("font-size", 13);
+	
+	svg.append("svg")
+		.attr("class", "axis")
+		.attr("transform", "translate(0," + width + ")")
+		.call(yAxis2)
+		.selectAll("text")
+		.attr("y", 28)
+		.attr("x", 120)
+		.attr("dy", "1.1em")
+		.style("text-anchor", "start")
+    	.style("background-color", "white")
+    	.style("font-size", 13);
+
+	svg.append("svg")
+    	.attr("class", "axis3")
+    	.attr("transform", "translate(0," + width + ")")
+    	.call(yAxis)
+    	.selectAll("text")
+    	.attr("y", 28)
+    	.attr("x", 120)
+    	.attr("dy", "1.1em")
+    	.style("text-anchor", "start")
+    	.style("font-size", 13);
+
+  svg.append("svg")
+    .attr("class", "axis3")
+    .attr("transform", "translate(0," + width + ")")
+    .call(yAxis2)
+    .selectAll("text")
+    .attr("y", 28)
+    .attr("x", 120)
+    .attr("dy", "1.1em")
+    .style("text-anchor", "start")
+      .style("font-size", 13);
+
+
+  svg.append("text")
+    .attr("class","h1")
+      .attr("dx", 15)
+        .attr("dy", 25)
+        .text(function(d) { return "BRANDEIS"})
+        .style("fill","#B19330");;
+
+  svg.append("text")
+    .attr("class","h1") 
+      .attr("dx", 185)
+        .attr("dy", 25)
+        .text(function(d) { return "SSFL"})
+        .style("fill","#A23623");
+
+  svg.append("text")
+    .attr("class","axis") 
+      .attr("dx", 120)
+        .attr("dy", 569)
+        .text(function(d) { return "2015"})
+          .style("font-size", 13);;
+
+  svg.append("text")
+    .attr("class","axis") 
+      .attr("dx", 120)
+        .attr("dy", 569)
+        .text(function(d) { return "2015"})
+          .style("font-size", 13);;
+
+svg.selectAll("rect")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "rect")
+      .attr("x", function(d) { return d.xposition3})
+      .attr("y", function(d) { return d.yposition3; })
+      .attr("width", function(d) { return d.svgwidth3; })
+      .attr("height", function(d) { return d.svgheight3; })
+      .style("fill", function(d) { return d.color_code3; })
+      .style("opacity",.2)
+
+svg.selectAll("rect2")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "rect")
+      .attr("x", function(d) { return d.xposition})
+      .attr("y", function(d) { return d.yposition; })
+      .attr("width", function(d) { return d.svgwidth; })
+      .attr("height", function(d) { return d.svgheight; })
+      .style("fill", function(d) { return d.color_code; })
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html(d.year +": " + "<br>" + d.descrip + "<br>" + d.descrip_2+"<br>" + d.descrip_3+".")
+               .style("left", (d3.event.pageX - 10) + "px")
+               .style("top", (d3.event.pageY + 10) + "px")
+               d3.select(this).style("fill", "#C0C0C0");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0),
+               d3.select(this).style("fill", function(d) { return d.color_code; });
+
+      })
+
+svg.selectAll("rect3")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "rect")
+      .attr("x", function(d) { return d.xposition2})
+      .attr("y", function(d) { return d.yposition2; })
+      .attr("width", function(d) { return d.svgwidth2; })
+      .attr("height", function(d) { return d.svgheight2; })
+      .style("fill", function(d) { return d.color_code2; })
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html(d.year2 +" : " + "<br>" + d.descrip2 + "<br>" + d.descrip02+ "<br>" + d.descrip03+".")
+               .style("left", (d3.event.pageX - 170) + "px")
+               .style("top", (d3.event.pageY + 10) + "px")
+               d3.select(this).style("fill", "#C0C0C0");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0),
+               d3.select(this).style("fill", function(d) { return d.color_code2; });
+
+      });
+  svg.append("rect")
+    .attr("x", 0)
+    .attr("y",570)
+    .attr("height", 100)
+    .attr("width", 400)
+      .style("fill","white")
+
+  svg.append("rect")
+    .attr("x", 0)
+    .attr("y",0)
+    .attr("height", 710)
+    .attr("width", 3)
+      .style("fill","white")
+
+  svg.append("text")
+    .attr("class","ant") 
+      .attr("dx", 5)
+        .attr("dy", 599)
+        .text(function(d) { return "*Tap each bar for more info and anywhere"})
+          .style("font-size", 13);;
+
+  svg.append("text")
+    .attr("class","ant") 
+      .attr("dx", 5)
+        .attr("dy", 614)
+        .text(function(d) { return " to remove your selection"})
+          .style("font-size", 13);;
+
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 7)
+        .attr("dy", 85)
+        .text(function(d) { return "1950-Present:"})
+        .style("fill","#4D4D4D");
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 7)
+        .attr("dy", 100)
+        .text(function(d) { return "Camp Alonim is open"})
+        .style("fill","#4D4D4D");
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 7)
+        .attr("dy", 115)
+        .text(function(d) { return "& Brandeis hosts adult"})
+        .style("fill","#4D4D4D");
+
+svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 7)
+        .attr("dy", 130)
+        .text(function(d) { return "weekends, retreats,"})
+        .style("fill","#4D4D4D");
+
+svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 7)
+        .attr("dy", 145)
+        .text(function(d) { return "college institues"})
+        .style("fill","#4D4D4D");
+
+    svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 7)
+        .attr("dy", 160)
+        .text(function(d) { return "& other events"})
+        .style("fill","#4D4D4D");
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 162)
+        .attr("dy", 435)
+        .text(function(d) { return "1953-2006: "})
+        .style("fill","#4D4D4D");
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 162)
+        .attr("dy", 450)
+        .text(function(d) { return "Thousands of rocket"})
+        .style("fill","#4D4D4D");
+
+    svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 162)
+        .attr("dy", 465)
+        .text(function(d) { return "tests are performed"})
+        .style("fill","#4D4D4D");
+        
+    svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 162)
+        .attr("dy", 480)
+        .text(function(d) { return "at SSFL"})
+        .style("fill","#4D4D4D");
+
+  svg.append("rect")
+    .attr("x", 5)
+    .attr("y",61)
+    .attr("height", 10)
+    .attr("width", 105)
+      .style("fill","#EEC535")
+
+  svg.append("rect")
+    .attr("x", 160)
+    .attr("y",487)
+    .attr("height", 10)
+    .attr("width", 100)
+      .style("fill","#A23623")
+
+
+
+  });
+    </script>
+</div>
+
+</html>

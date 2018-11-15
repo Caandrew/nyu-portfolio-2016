@@ -1,0 +1,194 @@
+body {
+  font: 10px sans-serif;
+  margin: 0px;
+  padding: 0px;
+}
+
+h1 { 
+  font-family: 'Roboto', sans-serif;
+  font-size: 25px;
+  font-weight: 300;
+  margin-bottom: 10px;
+  line-height: 1.2em;
+}
+
+h2 { 
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  margin-bottom: 10px;
+  line-height: 1.2em;
+}
+
+p {
+  font-family: 'Arimo', sans-serif;
+  font-size: 14px;
+  line-height: 1.3em;
+  color: #333;
+ 
+}
+
+.padding{
+  width: 620;
+  height:1095;
+  padding-left: 70px;
+}
+.ant {
+  font-family: 'Arimo', sans-serif;
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1.3em;
+  color: #333;
+ 
+}
+
+.p {
+  font-family: 'Arimo', sans-serif;
+  font-size: 14px;
+  line-height: 1.3em;
+  color: #333;
+ 
+}
+
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: lightgrey;
+  shape-rendering: crispEdges;
+}
+
+.y.axis path {
+  display: none;
+}
+
+.y.axis2 path {
+  fill: none;
+  stroke: lightgrey;
+  shape-rendering: crispEdges;
+}
+
+.line_total {
+  fill: none;
+  stroke: #3E7FA5;
+  stroke-width: 2.5px;
+}
+
+.line {
+  fill: none;
+  stroke: #EEC535;
+  stroke-width: 2.5px;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focusT circle {
+  fill: none;
+  stroke: #3E7FA5;
+}
+
+
+.focus circle {
+  fill: none;
+  stroke: #EEC535;
+}
+
+.parent{
+    width: 620px;
+    height: 1095px;
+    margin: 0 auto;
+ }
+
+.title{
+  width:620px;
+  height:75px;
+}
+
+.parentm{
+    
+    margin: 0px 10px;
+ }
+
+.table {
+  width: 100%;
+}
+.titlem{
+  width:100%;
+  height:75px;
+}
+
+.footm {
+  font-family: Arial;
+  font-size: 11px; 
+  color: #999;
+  margin-top: 15px;
+
+}
+.spacem {
+  width: 300px;
+  height: 25px;
+  float:left;
+}
+
+.foot {
+  width: 620px;
+  height: 100px;
+  font-family: 'Roboto';
+  font-size: 11px; 
+  color: #999;
+  float: left;
+}
+.space {
+  width: 620px;
+  height: 25px;
+  float:left;
+}
+
+
+.total{
+    width: 250px;
+    height: 200px;
+    float: left;
+ }
+
+.lion{
+    width: 250px;
+    height: 200px;
+    float: left;
+ }
+
+.zebra{
+    width: 250px;
+    height: 200px;
+    float: left;
+ }
+
+.giraffe{
+    width: 250px;
+    height: 200px;
+    float: left;
+ }
+
+.leopard{
+    width: 250px;
+    height: 200px;
+    float: left;
+   }
+
+.buffalo{
+    width: 250px;
+    height: 200px;
+    float: left;}
+
+.rhino{
+    width: 250px;
+    height: 200px;
+    float: left;}
+
+.elephant{
+    width: 250px;
+    height: 200px;
+    float: left;}

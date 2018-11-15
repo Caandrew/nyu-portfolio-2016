@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+     <link rel="stylesheet" href="style.css">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+  </head>
+  <body>
+    <div class="wrap">
+            <div><p>Pope Francis becomes the fourth pontiff to visit the United States with his stops in Washington, D.C., New York and Philadelphia. Francis' six-day trip culminates with a visit to the World Meeting of Families in Philadelphia, where more than 1.5 million are expected to celebrate Mass at the Benjamin Franklin Parkway on Sept. 24. Ahead of Pope Francis' visit we toook an in depth look at past papal traval outside of Europe, the pope's presence at the World Meeting of Families and the number of people who will be able to catch a glimpse of the pontiff at Benjamin Franklin Parkway.</p></div>
+            <div class="travelHEAD">
+            <h1>Leaving Europe</h1>
+            <p>Pope Paul VI became the first pontiff to visit the Western Hemisphere during his visit to the U.S. in 1965. Since his inaugural trip to the Middle East and India one year earlier, Paul VI and his four successors have visited 275 countries. Some years their itineraries were small, or nonexistent - Pope John Paul I didn't leave Europe at all. Pope John Paul II twice visited 14 countries in a single year.</br></br><em>*Roll over each circle to see how many countries were visited that year</em></p> </div>
+            <div class="travel"></div>
+            <div class="timeline"><div class="textbox2"><h1>The Pope at the World Meeting of Families</h1></br><p>In 1994 popes began to include visits to the tri-annual World Meeting of Families, which is the world’s largest Catholic gathering. The six-day event closes with a Mass celebrated by the sitting pope. Since its inception, the meeting has been held mostly in Europe. This year is the first time the event is being held in the United States.</p></div></div>
+            <div class="parkwayHEAD"></div> 
+            <div class="parkway"><div class="textbox"><h1>Benjamin Franklin Parkway</h1></br><p>Pope Francis will celebrate Mass at Philadelphia’s iconic <strong>Benjamin Franklin Parkway</strong> on Sept. 27 before an estimated 1.5 million people. Unfortunately, for many, the parkway cannot accommodate that many people. The prime viewing area extends from Eakins Oval (in front of the Philadelphia Museum of Art) to JFK Plaza and consists of <strong>1.1 million square feet.</strong> City officials estimate roughly 400,000 people can comfortably in that area.</br></br>400,000 people is four times the number of protesters who in 1967 marched against the Vietnam War at the Lincoln Memorial, 1.6 times the number of those who gathered at Dr. Martin Luther King's 'I Have a Dream’ speech, and equivalent to the turnout for Woodstock.</p><div class="buttons">
+  <ul class="pagination">
+      <li class = "active"><a href="index.html">Replay Animation</a></li>
+    </div></div></div></div>
+            <div style="clear:both"></div>
+            <div class="credits">Credits: Cynthia Andrews / NBC</div>
+            <div class="credits">Sources: The World Meeting of Families, wikipedia.com</div>
+      </div>
+    <script>
+ 
+var margin = {top: -15, right: 0, bottom: 30, left: 0},
+    width = 960 - margin.left - margin.right,
+    height = 711 - margin.top - margin.bottom;
+ 
+var xx = d3.scale.linear()
+    .domain([0,960])
+    .range([0, width]);
+ 
+var yy = d3.scale.linear()
+    .domain([0,711])
+    .range([height, 0]);
+
+var svg = d3.select(".parkway").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+d3.csv("data.csv", function(data) {
+ 
+  // Coerce the strings to numbers.
+  data.forEach(function(d) {
+    d.x = +d.x;
+    d.y = +d.y;
+  });
+
+  // create a new empty array to hold the data
+  var step = 0,
+  dataToPlot = [];
+ 
+  var pointAdd = setInterval(
+  function(){
+    dataToPlot.push(data[step]);
+    step += 1;
+    // stop once all data is plotted
+      if (step > data.length) {
+      clearInterval(pointAdd);
+    } else {
+    addAPoint();
+    } 
+    
+  }
+  ,1);
+  
+  
+ svg.append("svg:image")
+     .attr("xlink:href", "http://media.nbcbayarea.com/images/parkway_extended.gif")
+     .attr("width", 960)
+     .attr("height", 725);
+
+  function addAPoint() {
+    svg.selectAll(".point")
+        .data(dataToPlot)
+      .enter().append("path")
+        .attr("class", "point")
+        .attr("d", d3.svg.symbol().size(8).type("circle"))
+        .attr("transform", function(d) { return "translate(" + xx(d.x) + "," + yy(d.y) + ")"; })
+
+        ;
+  }
+
+svg.append("text")
+        .attr("dx", 540)       
+        .attr("dy", 35)
+        .style("fill", "grey")        
+        .attr("class", "pkwyLBL")
+        .text(function(d) {return "Benjamin Franklin Parkway"})
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 100)
+        .attr("y1", 25)
+        .attr("x2", 100)
+        .attr("y2", 675)
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 100)
+        .attr("y1", 25)
+        .attr("x2", 125)
+        .attr("y2", 25);
+
+    svg.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 100)
+        .attr("y1", 675)
+        .attr("x2", 125)
+        .attr("y2", 675);
+
+    svg.append("text")
+        .attr("class", "small")
+        .attr("dx", 60)
+        .attr("dy", 350)
+        .text(function(d) { return "1.4"});
+
+    svg.append("text")
+        .attr("class", "small")
+        .attr("dx", 55)
+        .attr("dy", 365)
+        .text(function(d) { return "Miles"});
+
+    svg.append("text")
+        .attr("class", "pkwyLBL")
+        .style("fill", "grey")
+        .attr("dx", 540)
+        .attr("dy", 50)
+        .text(function(d) { return "Eakins Oval"});
+
+    svg.append("text")
+        .attr("class", "pkwyLBL")
+        .style("fill", "grey")
+        .attr("dx", 540)
+        .attr("dy", 214)
+        .text(function(d) { return "N 21 Street"});
+
+    svg.append("text")
+        .attr("class", "pkwyLBL")
+        .style("fill", "grey")
+        .attr("dx", 540)
+        .attr("dy", 400)
+        .text(function(d) { return "Logan Square"});
+
+    svg.append("text")
+        .attr("class", "pkwyLBL")
+        .style("fill", "grey")
+        .attr("dx",560)
+        .attr("dy", 612)
+        .text(function(d) { return "JFK Plaza"});
+
+    svg.append("text")
+        .attr("class", "pkwyLBL")
+        .style("fill", "grey")
+        .attr("dx", 555)
+        .attr("dy", 624)
+        .text(function(d) { return "(LOVE Park)"});
+
+    svg.append("text")
+        .attr("class", "h2")
+        .attr("dx", 825)
+        .attr("dy", 45)
+        .text(function(d) { return "PHILLY"});
+
+  svg.append("text")
+        .attr("class", "h2")
+        .attr("dx", 840)
+        .attr("dy", 90)
+        .text(function(d) { return "2015"});
+
+  svg.append("text")
+        .attr("class", "h2")
+        .attr("dx", 835)
+        .attr("dy", 135)
+        .text(function(d) { return "1.5 M"});
+
+  svg.append("text")
+        .attr("class", "small")
+        .transition().delay(8200)
+        .attr("dx", 150)
+        .attr("dy", 140)
+        .text(function(d) { return "100,000 - The number of people who marched"});
+
+  svg.append("text")
+        .attr("class", "small")
+        .transition().delay(8200)
+        .attr("dx", 150)
+        .attr("dy", 158)
+        .text(function(d) { return "on Lincoln Memorial to protest Vietnam in 1967"});
+
+svg.append("line")
+        .transition().delay(8200)
+        .style("stroke", "black") 
+        .attr("x1", 440)
+        .attr("y1", 142)
+        .attr("x2", 450)
+        .attr("y2", 142);
+
+  svg.append("text")
+        .attr("class", "small")
+        .transition().delay(19000)
+        .attr("dx", 170)
+        .attr("dy", 377.9)
+        .text(function(d) { return "250,000 - The number of people who" });
+ 
+  svg.append("text")
+        .attr("class", "small")
+        .transition().delay(19000)
+        .attr("dx", 170)
+        .attr("dy", 395.9)
+        .text(function(d) { return "attended the 'I Have a Dream' speech" });
+
+svg.append("line")
+        .transition().delay(19000)
+        .style("stroke", "black") 
+        .attr("x1", 415)
+        .attr("y1", 377.9)
+        .attr("x2", 435)
+        .attr("y2", 377.9);
+
+  svg.append("text")
+        .attr("class", "small")
+        .transition().delay(37350)
+        .attr("dx", 230)
+        .attr("dy", 675)
+        .text(function(d) { return "400,000 - The number of people"});
+
+  svg.append("text")
+        .attr("class", "small")
+        .transition().delay(37350)
+        .attr("dx", 230)
+        .attr("dy", 693)
+        .text(function(d) { return "in attendance at Woodstock"});
+
+svg.append("line")
+        .transition().delay(37350)
+        .style("stroke", "black") 
+        .attr("x1", 440)
+        .attr("y1", 675)
+        .attr("x2", 450)
+        .attr("y2", 675);
+
+svg.append("circle")
+        .attr("cx", 160)
+        .attr("cy", 50)
+        .attr("r", 5)
+        .attr("class", "point")
+
+
+svg.append("text")
+        .attr("dx", 170)
+        .attr("dy", 55)
+        .text(function(d) {return "Each circle represents ~ 90 people"})
+
+var margin1 = {top: 40, right: 40, bottom: 50, left: 40},
+    width = 960 - margin1.left - margin1.right,
+    height = 500 - margin1.top - margin1.bottom;
+
+var x = d3.scale.linear()
+    .domain([1963,2016])
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .domain([0,16])
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickSize(-height)
+    .tickFormat(d3.format("d"))
+    .tickValues(d3.range(1964, 2016, 3));
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickSize(-width)
+    .tickValues(d3.range(0, 18, 2));
+
+var svg1 = d3.select(".travel").append("svg")
+    .attr("width", width + margin1.left + margin1.right)
+    .attr("height", height + margin1.top + margin1.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
+
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+
+d3.tsv("travel_data.tsv", function(error, data) {
+  if (error) throw error;
+
+  data.forEach(function(d) {
+    d.destination_count = +d.destination_count;
+    d.year_of_travel = +d.year_of_travel;
+  });
+
+  svg1.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width)
+      .attr("y", -6)
+      .style("text-anchor", "end");
+
+  svg1.append("g")
+      .attr("class", "axis")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end");
+
+svg1.append("text")
+        .attr("class", "p")
+        .attr("dx", 37)
+        .attr("dy", 455)
+        .text(function(d) { return "Paul VI" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 16)
+        .attr("y1", 435)
+        .attr("x2", 117)
+        .attr("y2", 435);
+
+svg1.append("text")
+        .attr("class", "p")
+        .attr("dx", 150)
+        .attr("dy", 455)
+        .text(function(d) { return "John Paul I" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 132)
+        .attr("y1", 435)
+        .attr("x2", 250)
+        .attr("y2", 435);
+
+svg1.append("text")
+        .attr("class", "p")
+        .attr("dx", 425)
+        .attr("dy", 455)
+        .text(function(d) { return "John Paul II" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 265)
+        .attr("y1", 435)
+        .attr("x2", 680)
+        .attr("y2", 435);
+
+svg1.append("text")
+        .attr("class", "p")
+        .attr("dx", 715)
+        .attr("dy", 455)
+        .text(function(d) { return "Benedict XVI" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 697)
+        .attr("y1", 435)
+        .attr("x2", 813)
+        .attr("y2", 435);
+
+svg1.append("text")
+        .attr("class", "p")
+        .attr("dx", 825)
+        .attr("dy", 455)
+        .text(function(d) { return "Francis" });
+
+svg1.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 830)
+        .attr("y1", 435)
+        .attr("x2", 865)
+        .attr("y2", 435);
+
+  svg1.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("r", function(d) { return d.destination_count; })
+      .attr("cx", function(d) { return x(d.year_of_travel); })
+      .attr("cy", function(d) { return y(d.destination_count); })
+      .style("fill", function(d) { return d.color_code; })
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html("In " + d.year_of_travel + " " + "Pope " + d.pope + " traveled outside of Europe " + d.destination_count + " time(s)")
+               .style("left", (d3.event.pageX - 145) + "px")
+               .style("top", (d3.event.pageY + 12) + "px")
+               d3.select(this).style("fill", "#D8472A");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0),
+               d3.select(this).style("fill", d.color_code);
+
+      });
+
+});
+
+ var margin2 = {top: 60, right: 0, bottom: 0, left: 0},
+    width2 = 960 - margin2.left - margin2.right,
+    height2 = 280 - margin2.top - margin2.bottom;
+
+ var svg2 = d3.select(".timeline").append("svg")
+    .attr("width", width2 + margin2.left + margin2.right)
+    .attr("height", height2 + margin2.top + margin2.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 100)
+        .attr("y1", 220)
+        .attr("x2", 500)
+        .attr("y2", 220);
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 554)
+        .attr("y1", 100)
+        .attr("x2", 904)
+        .attr("y2", 100);
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 554)
+        .attr("y1", 100)
+        .attr("x2", 554)
+        .attr("y2", 25);
+
+svg2.append("text")
+        .attr("class", "pbold")
+        .attr("dx", 525)
+        .attr("dy", 5)
+        .text(function(d) { return "Rome, 1994" });
+svg2.append("text")
+        .attr("dx", 500)
+        .attr("dy", 20)
+        .text(function(d) { return "Attendence: 200,000" });
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 604)
+        .attr("y1", 100)
+        .attr("x2", 604)
+        .attr("y2", 140);
+
+svg2.append("text")
+        .attr("class", "pbold")
+        .attr("dx", 571)
+        .attr("dy", 155)
+        .text(function(d) { return "Rio, 1997" });
+
+svg2.append("text")
+        .attr("dx", 570)
+        .attr("dy", 170)
+        .text(function(d) { return "2,000,000 " });
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 654)
+        .attr("y1", 100)
+        .attr("x2", 654)
+        .attr("y2", 60);
+
+svg2.append("text")
+        .attr("class", "pbold")
+        .attr("dx", 615)
+        .attr("dy", 40)
+        .text(function(d) { return "Rome, 2000" });
+
+svg2.append("text")
+        .attr("dx", 625)
+        .attr("dy", 55)
+        .text(function(d) { return "300,000 " });
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 704)
+        .attr("y1", 100)
+        .attr("x2", 704)
+        .attr("y2", 175);
+
+svg2.append("text")
+        .attr("class", "pbold")
+        .attr("dx", 660)
+        .attr("dy", 190)
+        .text(function(d) { return "Manila, 2003" });
+svg2.append("text")
+        .attr("dx", 670)
+        .attr("dy", 205)
+        .text(function(d) { return "1,000,000" });
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 754)
+        .attr("y1", 100)
+        .attr("x2", 754)
+        .attr("y2", 25);
+
+
+svg2.append("text")
+        .attr("class", "pbold")
+        .attr("dx", 704)
+        .attr("dy", 5)
+        .text(function(d) { return "Valencia, 2006" });
+
+svg2.append("text")
+        .attr("dx", 724)
+        .attr("dy", 20)
+        .text(function(d) { return "200,000" });
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 804)
+        .attr("y1", 100)
+        .attr("x2", 804)
+        .attr("y2", 140);
+
+svg2.append("text")
+        .attr("class", "pbold")
+        .attr("dx", 754)
+        .attr("dy", 155)
+        .text(function(d) { return "Mexico City, 2009" });
+
+svg2.append("text")
+        .attr("dx", 784)
+        .attr("dy", 170)
+        .text(function(d) { return "65,000 " });
+
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 854)
+        .attr("y1", 100)
+        .attr("x2", 854)
+        .attr("y2", 60);
+
+svg2.append("text")
+        .attr("class", "pbold")
+        .attr("dx", 824)
+        .attr("dy", 40)
+        .text(function(d) { return "Milan, 2012" });
+
+svg2.append("text")
+        .attr("dx", 830)
+        .attr("dy", 55)
+        .text(function(d) { return "300,000 " });
+
+svg2.append("line")
+        .style("stroke", "grey") 
+        .attr("x1", 904)
+        .attr("y1", 100)
+        .attr("x2", 904)
+        .attr("y2", 210);
+
+svg2.append("path")         
+    .style("stroke", "grey")
+    .style("fill", "grey")    
+    .attr("d", "M 904,215, L 899,205, L 909,205 Z")
+
+ var margin3 = {top: 0, right: 0, bottom: 0, left: 0},
+    width3 = 960 - margin3.left - margin3.right,
+    height3 = 30 - margin3.top - margin3.bottom;
+
+var svg3 = d3.select(".parkwayHEAD").append("svg")
+    .attr("width", width3 + margin3.left + margin2.right)
+    .attr("height", height3 + margin3.top + margin2.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin3.left + "," + margin3.top + ")");
+
+svg3.append("circle")
+        .style("fill", "white") 
+        .style("stroke", "red") 
+        .style("stroke-dasharray", 4,4) 
+        .attr("cx", 93)
+        .attr("cy", 15)
+        .attr("r", 14);
+
+svg3.append("rect")
+        .attr("x", 60)
+        .attr("y", 8)
+        .attr("width", 65)
+        .attr("height", 15)
+        .attr("fill", "white")
+
+svg3.append("text")
+        .attr("class", "small")
+        .attr("dx", 63)
+        .attr("dy", 20)
+        .style("background-color", "white")
+        .text(function(d) { return "The Pope"});
+
+});
+
+
+</script>
