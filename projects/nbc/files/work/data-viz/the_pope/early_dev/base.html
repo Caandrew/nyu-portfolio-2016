@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script>
+
+var margin = {top: 100, right: 100, bottom: 150, left: 150},
+    width = 960 - margin.left - margin.right,
+    height = 2800 - margin.top - margin.bottom;
+
+var x = d3.scale.linear()
+    .domain([0,17])
+    .range([0, width]);
+
+var x2 = d3.scale.ordinal()
+    .domain([" ","Football (Total: 1,156)", "Soccer (410)", "Basketball (265)", "Volleyball (140)", "Softball (121)", "Wrestling (112)", "Cheer (62)", "Baseball (56)", "Cross Country (35)", "Swimming (21)", "Gymnastics (11)", "Tennis (7)", "Off Season (4)", "Golf (2)", "Lacrosse (1)", "Dance (1)", "Not Sport Specific (165)"])
+    .rangePoints([0, width])
+
+
+var x3 = d3.scale.ordinal()
+    .domain([" ","Football (Total: 1,156)", "Soccer (410)", "Basketball (265)", "Volleyball (140)", "Softball (121)", "Wrestling (112)", "Cheer (62)", "Baseball (56)", "Cross Country (35)", "Swimming (21)", "Gymnastics (11)", "Tennis (7)", "Off Season (4)", "Golf (2)", "Lacrosse (1)", "Dance (1)", "Not Sport Specific (165)"])
+    .rangePoints([0, width])
+
+
+var y = d3.scale.linear()
+    .domain([42,0])
+    .range([0,height]);
+
+var y2 = d3.scale.ordinal()
+    .domain([" ", "Aledo (54)", "Allen (69)", "Anna (11)", "Arlington (141)", "Azle (11)", "Birdville (37)", "Burleson (16)", "Carrollton-Farmers Branch (65)", "Cedar Hill (20)", "Cleburne (0)", "Coppell (47)", "Dallas (141)", "Denton (46)", "DeSoto (56)", "Duncanville (29)", "Ennis (0)", "Fort Worth (98)", "Frisco (114)", "Garland (116)", "Granbury (12)", "Grand Prairie (0)", "Grapeville/Colleyville (123)", "HEB (128)", "Highland Park (30)", "Irving (65)", "Keller (34)", "Lake Dallas (31)", "Lewisville (166)", "Little Elm (30)", "Mansfield (88)", "McKinney (94)", "Mesquite (177)", "Midlothian (35)", "Northwest (22)", "Plano (160)", "Prosper (22)", "Richardson (86)", "Rockwall (114)", "Southlake/Carroll (55)", "White Settlement (13)", "Wylie (Total: 78)",". "])
+    .rangePoints([0,height]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(d3.format(" "))
+    .tickValues(d3.range(0,17,1));
+
+var xAxis2 = d3.svg.axis()
+    .scale(x2)
+    .orient("bottom")
+
+
+var xAxis3 = d3.svg.axis()
+    .scale(x3)
+    .orient("top")
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickValues(0,42,1)
+
+var yAxis2 = d3.svg.axis()
+    .scale(y2)
+    .orient("left")
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+
+d3.tsv("data.tsv", function(error, data) {
+  if (error) throw error;
+
+  data.forEach(function(d) {
+    d.count = +d.count;
+    d.sport_numb = +d.sport_numb;
+  });
+
+  svg.selectAll(".dot")
+      .data(data)
+    .enter().append("circle")
+      .attr("class", "dot")
+      .attr("r", function(d) { return d.count*.33; })
+      .attr("cx", function(d) { return x(d.sport_numb); })
+      .attr("cy", function(d) { return y(d.dist_numb); })
+      .style("fill", function(d) { return d.color_code; })
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html("Total: " + d["count"] + "<br/>" + "<br/>"+ "HSM: " + d["count_hsm"] + "<br/>" + "JHM: " + d["count_jhm"] + "<br/>" + "HSF: " + d["count_hsf"] + "<br/>" + "JHF: " + d["count_jhf"] + "<br/>" + "NS: " + d["count_un"])
+               .style("left", (d3.event.pageX - 55) + "px")
+               .style("top", (d3.event.pageY + 10) + "px")
+               d3.select(this).style("fill", "#807F7F");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0),
+               d3.select(this).style("fill", "#D8472A");
+
+      });
+
+  svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis2)
+    .selectAll("text")
+    .attr("y", 0)
+    .attr("x", 9)
+    .attr("dy", "1.1em")
+    .attr("transform", "rotate(45)")
+    .style("text-anchor", "start");
+
+  svg.append("g")
+    .attr("class", "axis")
+    .call(xAxis3)
+    .selectAll("text")
+    .attr("y", 0)
+    .attr("x", 9)
+    .attr("dy", ".01em")
+    .attr("transform", "rotate(315)")
+    .style("text-anchor", "start");
+
+  svg.append("g")
+      .attr("class", "axis")
+      .call(yAxis2)
+
+  svg.append("text")
+      .attr("class", "credits")
+      .attr("dx", -150)
+      .attr("dy", 2675)
+      .text(function(d) { return "Credit: Cynthia Andrews/NBC"})
+
+    svg.append("text")
+      .attr("class", "foot")
+      .attr("dx", 10)
+      .attr("dy", 20)
+      .text(function(d) { return "*Mouse-over any circle for a detailed breakdown"});
+});
+
+</script>
