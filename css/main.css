@@ -70,6 +70,20 @@ body {
   vertical-align: middle;
 }
 
+.pull_quote {
+  opacity: .6;
+  padding-bottom: 32px;
+  font-size: 30px;
+  font-family: FG_Italic;
+}
+
+.stanislav {
+
+  text-indent: 50px;
+  font-size: 30px;
+  font-family:  FG_Italic;
+}
+
 /* Responsive layout - makes a two column-layout instead of four columns */
 @media screen and (max-width: 800px) {
   .column {
