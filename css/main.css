@@ -3,8 +3,20 @@
 }
 
 @font-face {
-  font-family: FG_Light;
+  font-family: FG_Italic;
+  src: url(fonts/franklin-gothic/FranklinGothicLightItalic.ttf);
+}
+
+@font-face {
+  font-family: FG_Light; 
   src: url(fonts/franklin-gothic/FranklinGothicLight.ttf);
+}
+
+body {
+  margin: 12px;
+  font-size: 24px;
+  font-family: FG_Light; 
+  padding: 15px;
 }
 
 body {
