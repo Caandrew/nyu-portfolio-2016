@@ -2,10 +2,16 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: FG_Light;
+  src: url(fonts/franklin-gothic/FranklinGothicLight.ttf);
+}
+
 body {
-  margin: 0;
+  margin: 12px;
+  padding: 15px;  
   font-size: 24px;
-  font-family: Franklin Gothic;
+  font-family: FG_Light;   
 }
 
 p {
@@ -18,7 +24,6 @@ a {
 
 .header {
   text-align: center;
-  padding: 0 4px;
 }
 
 .contact_container {

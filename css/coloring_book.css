@@ -1,11 +1,14 @@
+@font-face {
+  font-family: FG_Light;
+  src: url(fonts/franklin-gothic/FranklinGothicLight.ttf);
+}
 body {
   margin: 0;
-  font-family: Franklin Gothic;
+
 }
 
 .header {
   text-align: center;
-  padding: 32px;
 }
 
 .container {

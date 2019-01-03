@@ -3,15 +3,20 @@
 }
 
 @font-face {
-  font-family: "Franklin Gothic Book Italic";
-  src: url(fonts/franklin-gothic/FranklinGothicITALIC.ttf);
+  font-family: FG_Italic;
+  src: url(fonts/franklin-gothic/FranklinGothicLightItalic.ttf);
+}
+
+@font-face {
+  font-family: FG_Light; 
+  src: url(fonts/franklin-gothic/FranklinGothicLight.ttf);
 }
 
 body {
-  margin: 0;
+  margin: 12px;
   font-size: 24px;
-  font-family: "Franklin Gothic Book";
-  padding: 30px;
+  font-family: FG_Light; 
+  padding: 15px;
 }
 
 a {
@@ -20,24 +25,25 @@ a {
 
 .header {
   text-align: center;
-  padding: 0 4px;
 }
 
 .text_container {
+  padding: 15px;
   border-style: solid;
   border-color: #333;
   overflow: hidden;      
 }
 
 .pull_quote {
-  padding-bottom: 20px;
+  opacity: .6;
+  padding-bottom: 32px;
   font-size: 30px;
-  font-family: "Franklin Gothic Italic";
+  font-family: FG_Italic;
 }
 
 .stanislav {
 
   text-indent: 50px;
-  font-size: 24px;
-  font-family:  "Franklin Gothic Italic";
+  font-size: 30px;
+  font-family:  FG_Italic;
 }
