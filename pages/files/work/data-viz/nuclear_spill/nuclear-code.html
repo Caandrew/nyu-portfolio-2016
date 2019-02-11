@@ -1,0 +1,429 @@
+&lt;!DOCTYPE html&gt;<br />
+&lt;html&gt;<br />
+  &lt;head&gt;<br />
+    &lt;meta charset="utf-8"&gt;<br />
+     &lt;link rel="stylesheet" href="style.css"&gt;<br />
+    &lt;script src="http://d3js.org/d3.v3.min.js"&gt;&lt;/script&gt;<br />
+    &lt;script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"&gt;&lt;/script&gt;<br />
+  &lt;/head&gt;<br />
+  &lt;body&gt;<br />
+    &lt;div id="wrap"&gt;<br />
+            &lt;div class="spill"&gt;&lt;/div&gt;<br />
+    &lt;script&gt;<br />
+ <br />
+var margin1 = {top: 250, right: 120, bottom: 50, left: 120},<br />
+    width = 970 - margin1.left - margin1.right,<br />
+    height = 500 - margin1.top - margin1.bottom;<br />
+<br />
+var x = d3.scale.linear()<br />
+    .domain([1948,2015])<br />
+    .range([0, width]);<br />
+<br />
+var y = d3.scale.linear()<br />
+    .domain([1,0])<br />
+    .range([height,0]);<br />
+<br />
+var xAxis = d3.svg.axis()<br />
+    .scale(x)<br />
+    .orient("bottom")<br />
+    .tickFormat(d3.format("d"))<br />
+    .tickValues(d3.range(1952, 2011, 11));<br />
+<br />
+var yAxis = d3.svg.axis()<br />
+    .scale(y)<br />
+    .orient("left")<br />
+    .tickSize(-width)<br />
+    .tickValues(d3.range(-1, 1, 1));<br />
+<br />
+var svg = d3.select(".spill").append("svg")<br />
+    .attr("width", width + margin1.left + margin1.right)<br />
+    .attr("height", height + margin1.top + margin1.bottom)<br />
+  .append("g")<br />
+    .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");<br />
+<br />
+var tooltip = d3.select("body").append("div")<br />
+    .attr("class", "tooltip")<br />
+    .style("opacity", 0)<br />
+<br />
+d3.tsv("data.tsv", function(error, data) {<br />
+  if (error) throw error;<br />
+<br />
+  data.forEach(function(d) {<br />
+    d.set_domain = +d.set_domain;<br />
+    d.year = +d.year;<br />
+  });<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .attr("x1", 0)<br />
+        .attr("y1", 0)<br />
+        .attr("x2", 725)<br />
+        .attr("y2", 0);<br />
+<br />
+svg.append("circle")<br />
+        .style("fill", "white") <br />
+        .style("stroke", "red") <br />
+        .style("stroke-dasharray", 4,4) <br />
+        .attr("cx", 119.85074626865672)<br />
+        .attr("cy", 0)<br />
+        .attr("r", 10);<br />
+<br />
+  svg.selectAll(".dot")<br />
+      .data(data)<br />
+    .enter().append("circle")<br />
+      .attr("class", "dot")<br />
+      .attr("r", function(d) { return d.level; })<br />
+      .attr("cx", function(d) { return x(d.year); })<br />
+      .attr("cy", function(d) { return y(d.set_domain); })<br />
+      .style("fill", function(d) { return d.color_code; })<br />
+      .on("mouseover", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(200)<br />
+               .style("opacity", .9);<br />
+                  tooltip.html(d.tooltip_event + " " + d.day + ", " + d.year  + "&lt;br/&gt;" + "&lt;br/&gt;" + d.event_summary + "&lt;br/&gt;" + "&lt;br/&gt;" + d.health_effects)<br />
+               .style("left", (d3.event.pageX - 155) + "px")<br />
+               .style("top", (d3.event.pageY -180) + "px")<br />
+               d3.select(this).style("fill", "#807F7F");<br />
+      })<br />
+      .on("mouseout", function(d) {<br />
+          tooltip.transition()<br />
+               .duration(500)<br />
+               .style("opacity", 0),<br />
+               d3.select(this).style("fill", d.color_code);<br />
+<br />
+      });<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 43)<br />
+        .attr("y1", 75)<br />
+        .attr("x2", 43)<br />
+        .attr("y2", 10);<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 28)<br />
+        .attr("dy", 90)<br />
+        .text(function(d) { return "1952"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", -2)<br />
+        .attr("dy", 105)<br />
+        .text(function(d) { return "The Chalk River"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 23)<br />
+        .attr("dy", 120)<br />
+        .text(function(d) { return "Incident"});<br />
+<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 98)<br />
+        .attr("y1", -55)<br />
+        .attr("x2", 98)<br />
+        .attr("y2", -10);<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 79)<br />
+        .attr("dy", -90)<br />
+        .text(function(d) { return "1957"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 67)<br />
+        .attr("dy", -75)<br />
+        .text(function(d) { return "Kyshtym,"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 74)<br />
+        .attr("dy", -60)<br />
+        .text(function(d) { return "Russia"});<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 98)<br />
+        .attr("y1", 125)<br />
+        .attr("x2", 98)<br />
+        .attr("y2", 28);<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 79)<br />
+        .attr("dy", 140)<br />
+        .text(function(d) { return "1957"});<br />
+<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 49)<br />
+        .attr("dy", 155)<br />
+        .text(function(d) { return "Windscale Fire, "});<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 84)<br />
+        .attr("dy", 170)<br />
+        .text(function(d) { return "UK"});<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 120)<br />
+        .attr("y1", -125)<br />
+        .attr("x2", 120)<br />
+        .attr("y2", -15);<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 105)<br />
+        .attr("dy", -175)<br />
+        .text(function(d) { return "1959"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 58)<br />
+        .attr("dy", -160)<br />
+        .text(function(d) { return "Santa Susana Field"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 60)<br />
+        .attr("dy", -145)<br />
+        .text(function(d) { return "Laboratory, Sodium"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 60)<br />
+        .attr("dy", -130)<br />
+        .text(function(d) { return "Reactor Experiment"});<br />
+<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 140)<br />
+        .attr("y1", 75)<br />
+        .attr("x2", 140)<br />
+        .attr("y2", 10);<br />
+<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 125)<br />
+        .attr("dy", 90)<br />
+        .text(function(d) { return "1961"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 110)<br />
+        .attr("dy", 105)<br />
+        .text(function(d) { return "The SL-1"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 115)<br />
+        .attr("dy", 120)<br />
+        .text(function(d) { return "Incident"});<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 338)<br />
+        .attr("y1", -55)<br />
+        .attr("x2", 338)<br />
+        .attr("y2", -10);<br />
+<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 321)<br />
+        .attr("dy", -90)<br />
+        .text(function(d) { return "1979"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 290)<br />
+        .attr("dy", -75)<br />
+        .text(function(d) { return "The Three Mile"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 290)<br />
+        .attr("dy", -60)<br />
+        .text(function(d) { return "Island Disaster"});<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 348)<br />
+        .attr("y1", 75)<br />
+        .attr("x2", 348)<br />
+        .attr("y2", 10);<br />
+<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 333)<br />
+        .attr("dy", 90)<br />
+        .text(function(d) { return "1980"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 304)<br />
+        .attr("dy", 105)<br />
+        .text(function(d) { return "The Yucca Flat"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 324)<br />
+        .attr("dy", 120)<br />
+        .text(function(d) { return "Incident"});<br />
+<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 381)<br />
+        .attr("y1", -125)<br />
+        .attr("x2", 381)<br />
+        .attr("y2", -15);<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 366)<br />
+        .attr("dy", -160)<br />
+        .text(function(d) { return "1983"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 326)<br />
+        .attr("dy", -145)<br />
+        .text(function(d) { return "The Buenos Aires"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 361)<br />
+        .attr("dy", -130)<br />
+        .text(function(d) { return "Accident"});<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 414)<br />
+        .attr("y1", 125)<br />
+        .attr("x2", 414)<br />
+        .attr("y2", 10);<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 399)<br />
+        .attr("dy", 140)<br />
+        .text(function(d) { return "1986"});<br />
+<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 372)<br />
+        .attr("dy", 155)<br />
+        .text(function(d) { return "The Chernobyl"});<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 387)<br />
+        .attr("dy", 170)<br />
+        .text(function(d) { return "Accident"});<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 424)<br />
+        .attr("y1", -55)<br />
+        .attr("x2", 424)<br />
+        .attr("y2", -10);<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 429)<br />
+        .attr("dy", -90)<br />
+        .text(function(d) { return "1987"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 403)<br />
+        .attr("dy", -75)<br />
+        .text(function(d) { return "The Goiania"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 418)<br />
+        .attr("dy", -60)<br />
+        .text(function(d) { return "Accident"});<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 555)<br />
+        .attr("y1", 75)<br />
+        .attr("x2", 555)<br />
+        .attr("y2", 10);<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 539)<br />
+        .attr("dy", 90)<br />
+        .text(function(d) { return "1999"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 508)<br />
+        .attr("dy", 105)<br />
+        .text(function(d) { return "The Tokaimura"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 528)<br />
+        .attr("dy", 120)<br />
+        .text(function(d) { return "Accident"});<br />
+<br />
+svg.append("line")<br />
+        .style("stroke", "grey") <br />
+        .style("stroke-width", ".5")<br />
+        .attr("x1", 686)<br />
+        .attr("y1", -55)<br />
+        .attr("x2", 686)<br />
+        .attr("y2", -10);<br />
+<br />
+svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 672)<br />
+        .attr("dy", -90)<br />
+        .text(function(d) { return "2011"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 642)<br />
+        .attr("dy", -75)<br />
+        .text(function(d) { return "The Fukushima"});<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "p")<br />
+        .attr("dx", 642)<br />
+        .attr("dy", -60)<br />
+        .text(function(d) { return "Daiichi Accident"});<br />
+<br />
+<br />
+  svg.append("text")<br />
+        .attr("class", "psmall")<br />
+        .attr("dx", 20)<br />
+        .attr("dy", -230)<br />
+        .text(function(d) { return "Roll over the circles to read about each accident"});<br />
+});<br />
+    &lt;/script&gt;

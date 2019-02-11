@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<meta charset="utf-8">
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+	</head>
+  <div class = wrap>
+	<div class=main></div>
+
+	<body>
+	<script>
+
+	var margin = {top: 25, right: 55, bottom: 45, left: -5},
+    width = 970 - margin.left - margin.right,
+    height = 450 - margin.top - margin.bottom;
+
+	var x = d3.scale.linear()
+    .domain([1947,2020])
+    .range([0, width]);
+
+	var x2 = d3.scale.linear()
+    .domain([1947,2022])
+    .range([0, width]);
+
+	var y = d3.scale.linear()
+    .domain([200,0])
+    .range([0,height]);
+
+	var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(d3.format(" "))
+    .tickSize(-height)
+    .tickValues(d3.range(1947,2016, 10));
+
+	var xAxis2 = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(d3.format(" "))
+    .tickSize(-height)
+    .tickValues(d3.range(1952,2022, 10));
+
+	var xAxis3 = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(d3.format(" "))
+    .tickValues(d3.range(0,0,0));
+
+    var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickValues(0,42,1)
+
+
+    var svg = d3.select(".main").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+
+	d3.tsv("data.tsv", function(error, data) {
+  		if (error) throw error;
+
+	svg.append("g")
+    	.attr("class", "axis2")
+    	.attr("transform", "translate(0," + 173 + ")")
+    	.call(xAxis3)
+
+	svg.append("g")
+    	.attr("class", "axis")
+    	.attr("transform", "translate(0," + height + ")")
+    	.call(xAxis)
+    	.selectAll("text")
+    	.attr("y", -200)
+    	.attr("x", 45)
+    	.attr("dy", "1.1em")
+    	.style("text-anchor", "start")
+    	.style("background-color", "white")
+    	.style("font-size", 13);
+	
+	svg.append("g")
+		.attr("class", "axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis2)
+		.selectAll("text")
+		.attr("y", -230)
+		.attr("x", 45)
+		.attr("dy", "1.1em")
+		.style("text-anchor", "start")
+    	.style("background-color", "white")
+    	.style("font-size", 13);
+
+	svg.append("g")
+		.attr("class", "axis3")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis2)
+		.selectAll("text")
+		.attr("y", -230)
+		.attr("x", 45)
+		.attr("dy", "1.1em")
+		.style("text-anchor", "start")
+    	.style("font-size", 13);
+	
+	svg.append("g")
+    	.attr("class", "axis3")
+    	.attr("transform", "translate(0," + height + ")")
+    	.call(xAxis)
+    	.selectAll("text")
+    	.attr("y", -200)
+    	.attr("x", 45)
+    	.attr("dy", "1.1em")
+    	.style("text-anchor", "start")
+    	.style("font-size", 13);
+
+
+	svg.append("rect")
+		.attr("x", -1)
+		.attr("y",355)
+		.attr("height", 75)
+		.attr("width", 970)
+    	.style("fill","white")
+
+
+svg.selectAll("rect")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "rect")
+      .attr("x", function(d) { return d.xposition2})
+      .attr("y", function(d) { return d.yposition2; })
+      .attr("width", function(d) { return d.svgwidth2; })
+      .attr("height", function(d) { return d.svgheight2; })
+      .style("fill", function(d) { return d.color_code2; })
+      .style("opacity",.2)
+
+	svg.selectAll("rect2")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "rect")
+      .attr("x", function(d) { return d.xposition})
+      .attr("y", function(d) { return d.yposition; })
+      .attr("width", function(d) { return d.svgwidth; })
+      .attr("height", function(d) { return d.svgheight; })
+      .style("fill", function(d) { return d.color_code; })
+      .on("mouseover", function(d) {
+          tooltip.transition()
+               .duration(200)
+               .style("opacity", .9);
+                  tooltip.html(d.year +": " + "<br>" + d.descrip + "<br>" + d.descrip2 + "<br>" + d.descrip3)
+               .style("left", (d3.event.pageX - 65) + "px")
+               .style("top", (d3.event.pageY - 80) + "px")
+               d3.select(this).style("fill", "#C0C0C0");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+               .duration(500)
+               .style("opacity", 0),
+               d3.select(this).style("fill", function(d) { return d.color_code; });
+
+      });
+
+
+  svg.append("text")
+    .attr("class","h1")
+      .attr("dx", 5)
+        .attr("dy", 30)
+        .text(function(d) { return "BRANDEIS"})
+        .style("fill","#B19330");
+
+  svg.append("text")
+    .attr("class","h1")
+      .attr("dx", 50)
+        .attr("dy", 330)
+        .text(function(d) { return "SSFL"})
+        .style("fill","#A23623");
+
+    svg.append("rect")
+    .attr("x", 919)
+    .attr("y",0)
+    .attr("height", 600)
+    .attr("width", 10)
+      .style("fill","white")
+
+  svg.append("text")
+    .attr("class","axis") 
+      .attr("dx", 895)
+        .attr("dy", 195)
+        .text(function(d) { return "2015"})
+          .style("font-size", 13);;
+
+  svg.append("text")
+    .attr("class","axis") 
+      .attr("dx", 895)
+        .attr("dy", 195)
+        .text(function(d) { return "2015"})
+          .style("font-size", 13);;
+
+  svg.append("rect")
+    .attr("x", 102)
+    .attr("y",10)
+    .attr("height", 130)
+    .attr("width",10)
+      .style("fill","#EEC535")
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 117)
+        .attr("dy", 30.2)
+        .text(function(d) { return "1950-Present:"})
+        .style("fill","#B19330");
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 117)
+        .attr("dy", 53.2)
+        .text(function(d) { return "Camp Alonim Summer Camp  is open and"})
+        .style("fill","#B19330");
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 117)
+        .attr("dy", 70)
+        .text(function(d) { return "Brandeis hosts adult weekend retreats,  "})
+        .style("fill","#B19330");
+
+    svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 117)
+        .attr("dy", 86.8)
+        .text(function(d) { return "college institues and other events"})
+        .style("fill","#B19330");
+
+  svg.append("rect")
+    .attr("x", 102)
+    .attr("y",215)
+    .attr("height", 130)
+    .attr("width",10)
+      .style("fill","#A23623")
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 117)
+        .attr("dy", 305)
+        .text(function(d) { return "1953-2006: "})
+        .style("fill","#A23623");
+
+  svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 117)
+        .attr("dy", 321.8)
+        .text(function(d) { return "Thousands of rocket tests "})
+        .style("fill","#A23623");
+
+    svg.append("text")
+    .attr("class","p") 
+      .attr("dx", 117)
+        .attr("dy", 338.6)
+        .text(function(d) { return "are performed at SSFL"})
+        .style("fill","#A23623");
+
+  svg.append("text")
+    .attr("class","ant") 
+      .attr("dx", 5)
+        .attr("dy", 400)
+        .text(function(d) { return "*Hover over each bar for more info"})
+          .style("font-size", 13);;
+
+
+});
+    </script>
+</div>
+	</body>
+
+</html>
