@@ -26,6 +26,15 @@ a {
   text-align: center;
 }
 
+.news_image {
+    width: 100%; 
+    border-style: solid;
+    border-width: 2px;
+    border-color: #333;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
 .contact_container {
     width: 100%; 
     border-style: solid;
